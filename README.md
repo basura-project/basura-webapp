@@ -40,7 +40,6 @@ catering to both employees and clients by providing tools for efficient waste ma
 4. Open a pull request for review and merge.
 
 ## License
-This project is proprietary and owned solely by **BASURA, Inc**.
-
+This project is the exclusive property of **BASURA, INC**. Any unauthorized redistribution or use for other purposes is prohibited and may result in legal action.
 ## Contact
 For any queries or issues, please reach out to Varun Biyyala or use the GitHub Issues tab to report problems.
