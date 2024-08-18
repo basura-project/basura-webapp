@@ -22,20 +22,22 @@ catering to both employees and clients by providing tools for efficient waste ma
 - Follow the established coding standards and make sure to document your code thoroughly.
 - Regularly update the team on your progress through the project’s GitHub Issues or Projects board.
 
-## Getting Started
+## Getting Started (Example)
 1. Clone the repository:
     ```bash
     git clone https://github.com/basura-project/team-collaboration.git
+    cd basura-webapp
+    
     ```
 2. Checkout the branch you will be working on:
     ```bash
-    git checkout -b branch-name
+    git checkout -b varun/chatbot
     ```
 3. Make your changes, commit them, and push to the repository:
     ```bash
     git add .
     git commit -m "Your message"
-    git push origin branch-name
+    git push origin varun/chatbot
     ```
 4. Open a pull request for review and merge.
 
