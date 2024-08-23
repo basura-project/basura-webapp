@@ -1,0 +1,2057 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is the Basura API documentation",
+    "version": "1.0.0",
+    "title": "Basura API"
+  },
+  "host": "basura-d389d141409a.herokuapp.com",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "user",
+      "description": "Operations about user"
+    },
+    {
+      "name": "employee",
+      "description": "Operations about employees"
+    },
+    {
+      "name": "property",
+      "description": "Operations about properties"
+    },
+    {
+      "name": "client",
+      "description": "Operations about clients"
+    },
+    {
+      "name": "garbage-attributes",
+      "description": "Operations related to garbage attributes"
+    },
+    {
+  "name": "entry",
+  "description": "Operations related to garbage entries"
+},
+    {
+  "name": "analytics",
+  "description": "Operations related to analytics"
+}
+
+
+  ],
+  "paths": {
+    "/login": {
+      "post": {
+        "tags": ["user"],
+        "summary": "Login a user",
+        "operationId": "login",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "User login credentials",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UserLogin"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User logged in successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "access_token": {
+                  "type": "string",
+                  "description": "JWT access token"
+                },
+                "refresh_token": {
+                  "type": "string",
+                  "description": "JWT refresh token"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid username or password"
+          },
+          "500": {
+            "description": "Error logging in user"
+          }
+        }
+      }
+    },
+    "/token/refresh": {
+      "post": {
+        "tags": ["user"],
+        "summary": "Refresh JWT token",
+        "operationId": "refreshToken",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Token refreshed successfully",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "access_token": {
+                  "type": "string",
+                  "description": "New JWT access token"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error refreshing token"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/user/details": {
+      "get": {
+        "tags": ["user"],
+        "summary": "Get user details",
+        "operationId": "getUserDetails",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "User details retrieved successfully",
+            "schema": {
+              "$ref": "#/definitions/UserDetails"
+            }
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Error fetching user details"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/forgot-password": {
+      "post": {
+        "tags": ["user"],
+        "summary": "Forgot password",
+        "operationId": "forgotPassword",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Email to send password reset link",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ForgotPassword"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Password reset link sent to email"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Error in forgot password"
+          }
+        }
+      }
+    },
+    "/reset-password/{token}": {
+      "post": {
+        "tags": ["user"],
+        "summary": "Reset password",
+        "operationId": "resetPassword",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "description": "Token sent to user's email for password reset",
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "New password",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ResetPassword"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Password updated successfully"
+          },
+          "400": {
+            "description": "Invalid or expired token"
+          },
+          "500": {
+            "description": "Error resetting password"
+          }
+        }
+      }
+    },
+    "/profile/photo": {
+      "put": {
+        "tags": ["user"],
+        "summary": "Update user profile photo",
+        "operationId": "updateProfilePhoto",
+        "consumes": ["multipart/form-data"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "profile_photo",
+            "description": "New profile photo to upload",
+            "required": true,
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profile photo updated successfully"
+          },
+          "400": {
+            "description": "Invalid profile photo file type"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Error updating profile photo"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/suggest_employee_id": {
+      "get": {
+        "tags": ["employee"],
+        "summary": "Suggest new employee ID",
+        "operationId": "suggestEmployeeId",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Suggested employee ID",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "suggested_employee_id": {
+                  "type": "string",
+                  "example": "EMP12346"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error suggesting employee ID"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/add-employee": {
+      "post": {
+        "tags": ["employee"],
+        "summary": "Add a new employee",
+        "operationId": "addEmployee",
+        "consumes": ["multipart/form-data"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "employee_id",
+            "description": "Employee ID",
+            "required": true,
+            "type": "string",
+            "example": "EMP12345"
+          },
+          {
+            "in": "formData",
+            "name": "firstname",
+            "description": "First name",
+            "required": true,
+            "type": "string",
+            "example": "John"
+          },
+          {
+            "in": "formData",
+            "name": "middlename",
+            "description": "Middle name",
+            "type": "string",
+            "example": "M"
+          },
+          {
+            "in": "formData",
+            "name": "lastname",
+            "description": "Last name",
+            "required": true,
+            "type": "string",
+            "example": "Doe"
+          },
+          {
+            "in": "formData",
+            "name": "contact",
+            "description": "Contact number",
+            "type": "string",
+            "example": "+1234567890"
+          },
+          {
+            "in": "formData",
+            "name": "email",
+            "description": "Email address",
+            "required": true,
+            "type": "string",
+            "example": "john.doe@example.com"
+          },
+          {
+            "in": "formData",
+            "name": "username",
+            "description": "Username",
+            "required": true,
+            "type": "string",
+            "example": "john_doe"
+          },
+          {
+            "in": "formData",
+            "name": "bank_account_no",
+            "description": "Bank Account Number",
+            "required": true,
+            "type": "string",
+            "example": "1234567890123456"
+          },
+          {
+            "in": "formData",
+            "name": "password",
+            "description": "Password",
+            "required": true,
+            "type": "string",
+            "example": "password123"
+          },
+          {
+            "in": "formData",
+            "name": "role",
+            "description": "Role of the user",
+            "required": true,
+            "type": "string",
+            "example": "employee"
+          },
+          {
+            "in": "formData",
+            "name": "id_proof",
+            "description": "ID Proof (PDF, PNG, etc.)",
+            "type": "file"
+          },
+          {
+            "in": "formData",
+            "name": "profile_photo",
+            "description": "Profile Photo",
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Employee created successfully"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "500": {
+            "description": "Error creating employee"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/employees": {
+      "get": {
+        "tags": ["employee"],
+        "summary": "Get list of employees",
+        "operationId": "getEmployees",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "description": "Page number for pagination",
+            "required": false,
+            "type": "integer",
+            "example": 1
+          },
+          {
+            "in": "query",
+            "name": "sort_by",
+            "description": "Field to sort by",
+            "required": false,
+            "type": "string",
+            "enum": ["employee_id", "name.firstname", "email"],
+            "example": "employee_id"
+          },
+          {
+            "in": "query",
+            "name": "sort_order",
+            "description": "Order of sorting",
+            "required": false,
+            "type": "string",
+            "enum": ["asc", "desc"],
+            "example": "asc"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of employees",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Employee"
+              }
+            }
+          },
+          "500": {
+            "description": "Error fetching employees"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/employee/{employee_id}": {
+      "get": {
+        "tags": ["employee"],
+        "summary": "Get details of a specific employee",
+        "operationId": "viewEmployee",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "employee_id",
+            "in": "path",
+            "description": "ID of employee to fetch",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Employee details",
+            "schema": {
+              "$ref": "#/definitions/Employee"
+            }
+          },
+          "404": {
+            "description": "Employee not found"
+          },
+          "500": {
+            "description": "Error fetching employee details"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": ["employee"],
+        "summary": "Update details of a specific employee",
+        "operationId": "editEmployee",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "employee_id",
+            "in": "path",
+            "description": "ID of employee to update",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Updated employee details",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/EmployeeUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Employee updated successfully"
+          },
+          "404": {
+            "description": "Employee not found"
+          },
+          "500": {
+            "description": "Error updating employee"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": ["employee"],
+        "summary": "Delete a specific employee",
+        "operationId": "deleteEmployee",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "employee_id",
+            "in": "path",
+            "description": "ID of employee to delete",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Employee deleted successfully"
+          },
+          "404": {
+            "description": "Employee not found"
+          },
+          "500": {
+            "description": "Error deleting employee"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/suggest_property_id": {
+      "get": {
+        "tags": ["property"],
+        "summary": "Suggest new property ID",
+        "operationId": "suggestPropertyId",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Suggested property ID",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "suggested_property_id": {
+                  "type": "string",
+                  "example": "PROP12346"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error suggesting property ID"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/add-property": {
+      "post": {
+        "tags": ["property"],
+        "summary": "Add a new property",
+        "operationId": "addProperty",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Property data",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Property"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Property created successfully"
+          },
+          "400": {
+            "description": "Property ID already exists"
+          },
+          "500": {
+            "description": "Error adding property"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/properties": {
+      "get": {
+        "tags": ["property"],
+        "summary": "Get list of properties",
+        "operationId": "getProperties",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "description": "Page number for pagination",
+            "required": false,
+            "type": "integer",
+            "example": 1
+          },
+          {
+            "in": "query",
+            "name": "sort_by",
+            "description": "Field to sort by",
+            "required": false,
+            "type": "string",
+            "enum": ["property_id", "property_manager_name", "email"],
+            "example": "property_id"
+          },
+          {
+            "in": "query",
+            "name": "sort_order",
+            "description": "Order of sorting",
+            "required": false,
+            "type": "string",
+            "enum": ["asc", "desc"],
+            "example": "asc"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of properties",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Property"
+              }
+            }
+          },
+          "500": {
+            "description": "Error fetching properties"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/property/{property_id}": {
+      "get": {
+        "tags": ["property"],
+        "summary": "Get details of a specific property",
+        "operationId": "viewProperty",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "property_id",
+            "in": "path",
+            "description": "ID of property to fetch",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Property details",
+            "schema": {
+              "$ref": "#/definitions/Property"
+            }
+          },
+          "404": {
+            "description": "Property not found"
+          },
+          "500": {
+            "description": "Error fetching property details"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": ["property"],
+        "summary": "Update details of a specific property",
+        "operationId": "editProperty",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "property_id",
+            "in": "path",
+            "description": "ID of property to update",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Updated property details",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PropertyUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Property updated successfully"
+          },
+          "404": {
+            "description": "Property not found"
+          },
+          "500": {
+            "description": "Error updating property"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": ["property"],
+        "summary": "Delete a specific property",
+        "operationId": "deleteProperty",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "property_id",
+            "in": "path",
+            "description": "ID of property to delete",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Property deleted successfully"
+          },
+          "404": {
+            "description": "Property not found"
+          },
+          "500": {
+            "description": "Error deleting property"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/client-id/suggest": {
+      "get": {
+        "tags": ["client"],
+        "summary": "Suggest new client ID",
+        "operationId": "suggestClientId",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Suggested client ID",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "suggested_client_id": {
+                  "type": "string",
+                  "example": "CLI12346"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error suggesting client ID"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/add-client": {
+      "post": {
+        "tags": ["client"],
+        "summary": "Add a new client",
+        "operationId": "addClient",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Client data",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Client"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Client created successfully"
+          },
+          "400": {
+            "description": "Client ID already exists"
+          },
+          "500": {
+            "description": "Error adding client"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/clients": {
+      "get": {
+        "tags": ["client"],
+        "summary": "Get list of clients",
+        "operationId": "getClients",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "description": "Page number for pagination",
+            "required": false,
+            "type": "integer",
+            "example": 1
+          },
+          {
+            "in": "query",
+            "name": "sort_by",
+            "description": "Field to sort by",
+            "required": false,
+            "type": "string",
+            "enum": ["client_id", "client_name", "email"],
+            "example": "client_id"
+          },
+          {
+            "in": "query",
+            "name": "sort_order",
+            "description": "Order of sorting",
+            "required": false,
+            "type": "string",
+            "enum": ["asc", "desc"],
+            "example": "asc"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of clients",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Client"
+              }
+            }
+          },
+          "500": {
+            "description": "Error fetching clients"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/client/{client_id}": {
+      "get": {
+        "tags": ["client"],
+        "summary": "Get details of a specific client",
+        "operationId": "viewClient",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "description": "ID of client to fetch",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client details",
+            "schema": {
+              "$ref": "#/definitions/Client"
+            }
+          },
+          "404": {
+            "description": "Client not found"
+          },
+          "500": {
+            "description": "Error fetching client details"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": ["client"],
+        "summary": "Update details of a specific client",
+        "operationId": "editClient",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "description": "ID of client to update",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Updated client details",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ClientUpdate"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client updated successfully"
+          },
+          "404": {
+            "description": "Client not found"
+          },
+          "500": {
+            "description": "Error updating client"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": ["client"],
+        "summary": "Delete a specific client",
+        "operationId": "deleteClient",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "description": "ID of client to delete",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Client deleted successfully"
+          },
+          "404": {
+            "description": "Client not found"
+          },
+          "500": {
+            "description": "Error deleting client"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/unassigned-properties": {
+      "get": {
+        "tags": ["property"],
+        "summary": "Get unassigned properties",
+        "operationId": "getUnassignedProperties",
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "List of unassigned properties",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "500": {
+            "description": "Error fetching unassigned properties"
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/garbage-attributes": {
+  "get": {
+    "tags": ["garbage-attributes"],
+    "summary": "Get all garbage attributes",
+    "operationId": "getGarbageAttributes",
+    "produces": ["application/json"],
+    "responses": {
+      "200": {
+        "description": "List of garbage attributes",
+        "schema": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GarbageAttribute"
+          }
+        }
+      },
+      "500": {
+        "description": "Error fetching garbage attributes"
+      }
+    },
+    "security": [
+      {
+        "Bearer": []
+      }
+    ]
+  },
+  "post": {
+    "tags": ["garbage-attributes"],
+    "summary": "Add a new garbage attribute",
+    "operationId": "addGarbageAttribute",
+    "consumes": ["application/json"],
+    "produces": ["application/json"],
+    "parameters": [
+      {
+        "in": "body",
+        "name": "body",
+        "description": "Garbage attribute to add",
+        "required": true,
+        "schema": {
+          "$ref": "#/definitions/GarbageAttribute"
+        }
+      }
+    ],
+    "responses": {
+      "201": {
+        "description": "Attribute added successfully"
+      },
+      "400": {
+        "description": "Attribute already exists"
+      },
+      "403": {
+        "description": "Access denied"
+      },
+      "500": {
+        "description": "Error adding attribute"
+      }
+    },
+    "security": [
+      {
+        "Bearer": []
+      }
+    ]
+  }
+},
+"/garbage-attributes/{attribute_name}": {
+  "put": {
+    "tags": ["garbage-attributes"],
+    "summary": "Update a garbage attribute",
+    "operationId": "editGarbageAttribute",
+    "consumes": ["application/json"],
+    "produces": ["application/json"],
+    "parameters": [
+      {
+        "name": "attribute_name",
+        "in": "path",
+        "description": "Name of the attribute to update",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "in": "body",
+        "name": "body",
+        "description": "Updated attribute data",
+        "required": true,
+        "schema": {
+          "$ref": "#/definitions/GarbageAttribute"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Attribute updated successfully"
+      },
+      "404": {
+        "description": "Attribute not found"
+      },
+      "403": {
+        "description": "Access denied"
+      },
+      "500": {
+        "description": "Error updating attribute"
+      }
+    },
+    "security": [
+      {
+        "Bearer": []
+      }
+    ]
+  },
+  "delete": {
+    "tags": ["garbage-attributes"],
+    "summary": "Delete a garbage attribute",
+    "operationId": "deleteGarbageAttribute",
+    "produces": ["application/json"],
+    "parameters": [
+      {
+        "name": "attribute_name",
+        "in": "path",
+        "description": "Name of the attribute to delete",
+        "required": true,
+        "type": "string"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Attribute deleted successfully"
+      },
+      "404": {
+        "description": "Attribute not found"
+      },
+      "403": {
+        "description": "Access denied"
+      },
+      "500": {
+        "description": "Error deleting attribute"
+      }
+    },
+    "security": [
+      {
+        "Bearer": []
+      }
+    ]
+  }
+},
+"/add-entry": {
+  "post": {
+    "tags": ["entry"],
+    "summary": "Add a new garbage entry",
+    "operationId": "addEntry",
+    "consumes": ["application/json"],
+    "produces": ["application/json"],
+    "parameters": [
+      {
+        "in": "body",
+        "name": "body",
+        "description": "Entry data to add",
+        "required": true,
+        "schema": {
+          "$ref": "#/definitions/Entry"
+        }
+      }
+    ],
+    "responses": {
+      "201": {
+        "description": "Entry added successfully"
+      },
+      "400": {
+        "description": "Missing required fields"
+      },
+      "403": {
+        "description": "Access denied"
+      },
+      "500": {
+        "description": "Error adding entry"
+      }
+    },
+    "security": [
+      {
+        "Bearer": []
+      }
+    ]
+  }
+},
+"/property-details/{property_id}": {
+  "get": {
+    "tags": ["property"],
+    "summary": "Fetch details of a specific property",
+    "operationId": "fetchPropertyDetails",
+    "produces": ["application/json"],
+    "parameters": [
+      {
+        "name": "property_id",
+        "in": "path",
+        "description": "ID of the property to fetch details for",
+        "required": true,
+        "type": "string"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Property details fetched successfully",
+        "schema": {
+          "$ref": "#/definitions/PropertyDetails"
+        }
+      },
+      "403": {
+        "description": "Access denied"
+      },
+      "404": {
+        "description": "Property or associated client not found"
+      },
+      "500": {
+        "description": "Error fetching property details"
+      }
+    },
+    "security": [
+      {
+        "Bearer": []
+      }
+    ]
+  }
+},
+    "/submissions": {
+  "get": {
+    "tags": ["entry"],
+    "summary": "Get submissions made by the current employee",
+    "operationId": "getSubmissions",
+    "produces": ["application/json"],
+    "parameters": [
+      {
+        "in": "query",
+        "name": "page",
+        "description": "Page number for pagination",
+        "required": false,
+        "type": "integer",
+        "example": 1
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "List of submissions",
+        "schema": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Entry"
+          }
+        }
+      },
+      "403": {
+        "description": "Access denied"
+      },
+      "500": {
+        "description": "Error fetching submissions"
+      }
+    },
+    "security": [
+      {
+        "Bearer": []
+      }
+    ]
+  }
+},
+"/analytics": {
+  "get": {
+    "tags": ["analytics"],
+    "summary": "Get analytics data for the current employee",
+    "operationId": "getAnalytics",
+    "produces": ["application/json"],
+    "parameters": [
+      {
+        "in": "query",
+        "name": "start_date",
+        "description": "Start date for the analytics range (YYYY-MM-DD)",
+        "required": true,
+        "type": "string",
+        "example": "2024-08-01"
+      },
+      {
+        "in": "query",
+        "name": "end_date",
+        "description": "End date for the analytics range (YYYY-MM-DD)",
+        "required": true,
+        "type": "string",
+        "example": "2024-08-15"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Analytics data fetched successfully",
+        "schema": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Entry"
+          }
+        }
+      },
+      "400": {
+        "description": "Both start_date and end_date are required"
+      },
+      "403": {
+        "description": "Access denied"
+      },
+      "500": {
+        "description": "Error fetching analytics data"
+      }
+    },
+    "security": [
+      {
+        "Bearer": []
+      }
+    ]
+  }
+},
+    "/client/{client_id}/properties": {
+  "get": {
+    "tags": ["client"],
+    "summary": "Get properties associated with a client",
+    "operationId": "getClientProperties",
+    "produces": ["application/json"],
+    "parameters": [
+      {
+        "name": "client_id",
+        "in": "path",
+        "description": "ID of the client to fetch properties for",
+        "required": true,
+        "type": "string"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "List of properties associated with the client",
+        "schema": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Property"
+          }
+        }
+      },
+      "403": {
+        "description": "Access denied"
+      },
+      "404": {
+        "description": "Client not found"
+      },
+      "500": {
+        "description": "Error fetching client properties"
+      }
+    },
+    "security": [
+      {
+        "Bearer": []
+      }
+    ]
+  }
+},
+"/client/{client_id}/entries": {
+  "get": {
+    "tags": ["client"],
+    "summary": "Get entries associated with a client",
+    "operationId": "getClientEntries",
+    "produces": ["application/json"],
+    "parameters": [
+      {
+        "name": "client_id",
+        "in": "path",
+        "description": "ID of the client to fetch entries for",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "in": "query",
+        "name": "start_date",
+        "description": "Start date for the entries range (YYYY-MM-DD)",
+        "required": false,
+        "type": "string",
+        "example": "2024-08-01"
+      },
+      {
+        "in": "query",
+        "name": "end_date",
+        "description": "End date for the entries range (YYYY-MM-DD)",
+        "required": false,
+        "type": "string",
+        "example": "2024-08-15"
+      },
+      {
+        "in": "query",
+        "name": "property_ids",
+        "description": "List of property IDs to filter entries",
+        "required": false,
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "List of entries associated with the client",
+        "schema": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Entry"
+          }
+        }
+      },
+      "403": {
+        "description": "Access denied"
+      },
+      "404": {
+        "description": "Client not found"
+      },
+      "500": {
+        "description": "Error fetching client entries"
+      }
+    },
+    "security": [
+      {
+        "Bearer": []
+      }
+    ]
+  }
+}
+
+
+  },
+  "definitions": {
+    "UserLogin": {
+      "type": "object",
+      "required": ["username", "password"],
+      "properties": {
+        "username": {
+          "type": "string",
+          "example": "john_doe"
+        },
+        "password": {
+          "type": "string",
+          "example": "password123"
+        }
+      }
+    },
+    "UserDetails": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "name": {
+          "type": "object",
+          "properties": {
+            "firstname": {
+              "type": "string"
+            },
+            "middlename": {
+              "type": "string"
+            },
+            "lastname": {
+              "type": "string"
+            }
+          }
+        },
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "ForgotPassword": {
+      "type": "object",
+      "required": ["email"],
+      "properties": {
+        "email": {
+          "type": "string",
+          "example": "user@example.com"
+        }
+      }
+    },
+    "ResetPassword": {
+      "type": "object",
+      "required": ["new_password"],
+      "properties": {
+        "new_password": {
+          "type": "string",
+          "example": "newpassword123"
+        }
+      }
+    },
+    "Employee": {
+      "type": "object",
+      "required": ["employee_id", "name", "email", "username", "password", "role"],
+      "properties": {
+        "employee_id": {
+          "type": "string",
+          "example": "EMP12345"
+        },
+        "name": {
+          "type": "object",
+          "properties": {
+            "firstname": {
+              "type": "string",
+              "example": "John"
+            },
+            "middlename": {
+              "type": "string",
+              "example": "M"
+            },
+            "lastname": {
+              "type": "string",
+              "example": "Doe"
+            }
+          }
+        },
+        "contact": {
+          "type": "string",
+          "example": "+1234567890",
+          "description": "Optional contact number"
+        },
+        "email": {
+          "type": "string",
+          "example": "john.doe@example.com"
+        },
+        "username": {
+          "type": "string",
+          "example": "john_doe"
+        },
+        "bank_account_no": {
+          "type": "string",
+          "example": "1234567890123456",
+          "description": "Bank Account Number"
+        },
+        "password": {
+          "type": "string",
+          "example": "password123"
+        },
+        "id_proof": {
+          "type": "string",
+          "example": "Base64 encoded file data",
+          "description": "Base64 encoded ID proof file (optional)"
+        },
+        "profile_photo": {
+          "type": "string",
+          "example": "Base64 encoded file data",
+          "description": "Base64 encoded profile photo file (optional)"
+        },
+        "role": {
+          "type": "string",
+          "example": "employee",
+          "description": "Role of the user"
+        }
+      }
+    },
+    "EmployeeUpdate": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "object",
+          "properties": {
+            "firstname": {
+              "type": "string",
+              "example": "John"
+            },
+            "middlename": {
+              "type": "string",
+              "example": "M"
+            },
+            "lastname": {
+              "type": "string",
+              "example": "Doe"
+            }
+          }
+        },
+        "contact": {
+          "type": "string",
+          "example": "+1234567890"
+        },
+        "email": {
+          "type": "string",
+          "example": "john.doe@example.com"
+        },
+        "bank_account_no": {
+          "type": "string",
+          "example": "1234567890123456"
+        },
+        "password": {
+          "type": "string",
+          "example": "newpassword123"
+        },
+        "role": {
+          "type": "string",
+          "example": "employee"
+        }
+      }
+    },
+    "Property": {
+      "type": "object",
+      "required": ["property_id", "property_type", "property_manager_name", "property_manager_phone_no", "email"],
+      "properties": {
+        "property_id": {
+          "type": "string",
+          "example": "PROP12345"
+        },
+        "property_type": {
+          "type": "string",
+          "example": "Resident Buildings"
+        },
+        "property_manager_name": {
+          "type": "string",
+          "example": "Manager Name"
+        },
+        "property_manager_phone_no": {
+          "type": "string",
+          "example": "+1234567890"
+        },
+        "email": {
+          "type": "string",
+          "example": "manager@example.com"
+        },
+        "owner_name": {
+          "type": "string",
+          "example": "Owner Name"
+        },
+        "owner_number": {
+          "type": "string",
+          "example": "+1234567890"
+        },
+        "apartment_type": {
+          "type": "string",
+          "example": "2BHK"
+        },
+        "housing_type": {
+          "type": "string",
+          "example": "Public"
+        },
+        "borough_name": {
+          "type": "string",
+          "example": "Brooklyn"
+        },
+        "street_name": {
+          "type": "string",
+          "example": "Main Street"
+        },
+        "building_number": {
+          "type": "string",
+          "example": "123"
+        },
+        "chute_present": {
+          "type": "boolean",
+          "example": true
+        },
+        "number_of_floors": {
+          "type": "integer",
+          "example": 5
+        },
+        "number_of_basement_floors": {
+          "type": "integer",
+          "example": 1
+        },
+        "number_of_units_per_floor": {
+          "type": "integer",
+          "example": 4
+        },
+        "number_of_units_total": {
+          "type": "integer",
+          "example": 20
+        },
+        "franchise_name": {
+          "type": "string",
+          "example": "McDonald's"
+        },
+        "inside_a_mall": {
+          "type": "boolean",
+          "example": false
+        },
+        "mall_name": {
+          "type": "string",
+          "example": "Mall Name"
+        },
+        "is_event": {
+          "type": "boolean",
+          "example": false
+        },
+        "event_name": {
+          "type": "string",
+          "example": "Event Name"
+        },
+        "retail_or_office": {
+          "type": "boolean",
+          "example": true
+        },
+        "industry_type": {
+          "type": "string",
+          "example": "Food"
+        },
+        "handling": {
+          "type": "string",
+          "example": "Federal"
+        },
+        "department": {
+          "type": "string",
+          "example": "Health"
+        },
+        "is_bid": {
+          "type": "boolean",
+          "example": true
+        },
+        "area_covered": {
+          "type": "string",
+          "example": "Main Street"
+        },
+        "building_type": {
+          "type": "string",
+          "example": "School"
+        },
+        "school": {
+          "type": "string",
+          "example": "Elementary"
+        }
+      }
+    },
+    "PropertyUpdate": {
+      "type": "object",
+      "properties": {
+        "property_manager_name": {
+          "type": "string",
+          "example": "Updated Manager Name"
+        },
+        "property_manager_phone_no": {
+          "type": "string",
+          "example": "+1234567891"
+        },
+        "email": {
+          "type": "string",
+          "example": "new.manager@example.com"
+        },
+        "owner_name": {
+          "type": "string",
+          "example": "Updated Owner Name"
+        },
+        "owner_number": {
+          "type": "string",
+          "example": "+1234567891"
+        },
+        "apartment_type": {
+          "type": "string",
+          "example": "3BHK"
+        },
+        "housing_type": {
+          "type": "string",
+          "example": "Private"
+        },
+        "borough_name": {
+          "type": "string",
+          "example": "Queens"
+        },
+        "street_name": {
+          "type": "string",
+          "example": "New Street"
+        },
+        "building_number": {
+          "type": "string",
+          "example": "456"
+        },
+        "chute_present": {
+          "type": "boolean",
+          "example": false
+        },
+        "number_of_floors": {
+          "type": "integer",
+          "example": 7
+        },
+        "number_of_basement_floors": {
+          "type": "integer",
+          "example": 2
+        },
+        "number_of_units_per_floor": {
+          "type": "integer",
+          "example": 5
+        },
+        "number_of_units_total": {
+          "type": "integer",
+          "example": 35
+        }
+      }
+    },
+    "Client": {
+      "type": "object",
+      "required": ["client_id", "client_name", "phone", "email", "username", "password"],
+      "properties": {
+        "client_id": {
+          "type": "string",
+          "example": "CLI12345"
+        },
+        "client_name": {
+          "type": "string",
+          "example": "Client Name"
+        },
+        "phone": {
+          "type": "string",
+          "example": "+1234567890"
+        },
+        "email": {
+          "type": "string",
+          "example": "client@example.com"
+        },
+        "username": {
+          "type": "string",
+          "example": "client_username"
+        },
+        "password": {
+          "type": "string",
+          "example": "password123"
+        },
+        "properties": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "example": "PROP12345"
+          },
+          "description": "List of property IDs assigned to the client"
+        }
+      }
+    },
+    "ClientUpdate": {
+      "type": "object",
+      "properties": {
+        "client_name": {
+          "type": "string",
+          "example": "Updated Client Name"
+        },
+        "phone": {
+          "type": "string",
+          "example": "+1234567891"
+        },
+        "email": {
+          "type": "string",
+          "example": "new.client@example.com"
+        },
+        "username": {
+          "type": "string",
+          "example": "updated_client_username"
+        },
+        "password": {
+          "type": "string",
+          "example": "newpassword123"
+        },
+        "properties": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "example": "PROP12345"
+          }
+        }
+      }
+    },
+    "GarbageAttribute": {
+  "type": "object",
+  "required": ["attribute_name", "color"],
+  "properties": {
+    "attribute_name": {
+      "type": "string",
+      "example": "Plastic"
+    },
+    "color": {
+      "type": "string",
+      "example": "#FFFFFF"
+    }
+  }
+},
+ "Entry": {
+  "type": "object",
+  "required": ["property_id", "client_id", "client_type", "client_name", "borough_name", "street_name", "chute_present", "timestamp", "garbage_attributes"],
+  "properties": {
+    "property_id": {
+      "type": "string",
+      "example": "PROP12345"
+    },
+    "client_id":{
+      "type": "string",
+      "example": "CLI2346"
+    },
+    "client_type": {
+      "type": "string",
+      "example": "Resident Buildings"
+    },
+    "client_name": {
+      "type": "string",
+      "example": "Client Name"
+    },
+    "borough_name": {
+      "type": "string",
+      "example": "Brooklyn"
+    },
+    "street_name": {
+      "type": "string",
+      "example": "Main Street"
+    },
+    "chute_present": {
+      "type": "boolean",
+      "example": true
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2024-08-15T14:30:00Z"
+    },
+    "garbage_attributes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number",
+        "example": 12.5
+      },
+      "description": "Dictionary of garbage attributes with weights"
+        },
+    "created_by": {
+      "type": "string",
+      "example": "employee_username",
+      "description": "Username of the employee who created the entry"
+    }
+  }
+},
+"PropertyDetails": {
+  "type": "object",
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "example": "CLI2346"
+    },
+    "client_type": {
+      "type": "string",
+      "example": "Resident Buildings"
+    },
+    "client_name": {
+      "type": "string",
+      "example": "Client Name"
+    },
+    "borough_name": {
+      "type": "string",
+      "example": "Brooklyn"
+    },
+    "street_name": {
+      "type": "string",
+      "example": "Main Street"
+    },
+    "chute_present": {
+      "type": "boolean",
+      "example": true
+    }
+  }
+},
+    "Analytics": {
+  "type": "object",
+  "properties": {
+    "property_id": {
+      "type": "string",
+      "example": "PROP12345"
+    },
+    "client_type": {
+      "type": "string",
+      "example": "Resident Buildings"
+    },
+    "client_name": {
+      "type": "string",
+      "example": "Client Name"
+    },
+    "borough_name": {
+      "type": "string",
+      "example": "Brooklyn"
+    },
+    "street_name": {
+      "type": "string",
+      "example": "Main Street"
+    },
+    "chute_present": {
+      "type": "boolean",
+      "example": true
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "example": "2024-08-15T14:30:00Z"
+    },
+    "garbage_attributes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number",
+        "example": 12.5
+      },
+      "description": "Dictionary of garbage attributes with weights"
+    },
+    "total_weight": {
+      "type": "number",
+      "example": 50.0,
+      "description": "Total weight of garbage collected"
+    },
+    "entries_count": {
+      "type": "integer",
+      "example": 5,
+      "description": "Number of entries within the specified date range"
+    }
+  }
+}
+
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  }
+}
