@@ -1,0 +1,89 @@
+Login API: Add in response User Details API + user type and access
+Get: User Details API + user type and access
+Token autogeneration
+Auth module 
+OTP to email for forgot password using Firebase
+Firebase login with email and also username and password
+login 
+
+For all the API handle all the error and edge cases along with the happy flow
+Super admin to be created only from back end 
+
+
+Employee Page
+Where ever there is list api use pagination
+get all submissions [list api]
+view a submission API
+Edit API
+
+The roster is attendance for the month or maybe with count of entries a day
+Freshdesk
+Mail Champ
+
+
+Chatbot and ticketing will put on hold for now
+
+
+Verify if the employee is working or not
+Geolocation and photography through the app
+
+
+Forcasting decide what to show
+Sample data for SARIMA and sample
+For Heatmap get a geotag
+
+Discuss in next call for API for graphs
+Visuals like covid19india.org
+
+Maps for later but be in the design
+
+Manging tickets to be routed to external app based on email id
+
+Create user API
+Profile image as buffer string
+
+
+Manage users
+delete api
+(Put) update api
+
+Client onboarding
+API for geolocation information
+Bohorgh
+Street name
+metadata works as well
+
+Identify which are auto fill and required and optional with errors in edge cases and responses for both Client onboarding and manage
+Unique identifier for each address in combination with name of the event or anything
+
+
+Clearity for Municiple tab
+
+update api for garbage API add a garbage attribute to existing ones
+get API for garbage API
+delete
+
+deploy on Aws or heroku
+
+
+
+
+focus on login/user details
+emplyee
+garbage data update api
+
+
+https://meet.google.com/kxb-yccj-mvr
+
+		  
+		  
+		  API for OTP Verification
+		  logout
+		  token refresh
+		  Cleint onboarding
+		  Garbage
+		  API for garbage fields for Employee
+		  Contracts Clearity
+		  Mock garbage data
+		  login have user details also sent
+		  Login and Garbage from Employee side, 

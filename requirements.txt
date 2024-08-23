@@ -1,0 +1,9 @@
+gunicorn==22.0.0
+packaging==24.1
+Flask
+Flask-JWT-Extended
+Flask-Cors
+Flask-Mail
+flask-swagger-ui
+bcrypt
+pymongo
