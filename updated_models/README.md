@@ -7,7 +7,7 @@ This repository contains implementations of time series forecasting models using
 - **Time LLM**: A cutting-edge time series forecasting model using a Large Language Model (LLM).
 
 ## How to Run:
-- **Time LLM**: To run the Time LLM model, execute the main script `main_script.py`. This will guide you through the forecasting process using the Time LLM model.
+- **Time LLM**: To run the Time LLM model, execute the main script `main_script.ipynb`. This will guide you through the forecasting process using the Time LLM model.
 
 ## Future Work:
 - **Prompt Bank**: Developing a prompt bank to enhance the versatility and accuracy of the Time LLM model.
