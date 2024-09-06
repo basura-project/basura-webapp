@@ -66,13 +66,13 @@ apiService.interceptors.response.use(
         console.error("Token refresh failed:", refreshError);
         Cookies.remove("access_token");
         Cookies.remove("refresh_token");
-        window.location.href = "/auth"; // Redirect to login if refresh fails
+        window.location.href = "/"; // Redirect to login if refresh fails
       }
     } else if (
       error.response.status === 401 &&
       error.response.data.msg === "Missing Authorization Header"
     ) {
-      window.location.href = "/auth";
+      window.location.href = "/";
     }
 
     // Return any error which is not due to authentication
@@ -112,7 +112,35 @@ export const addEmployee = async (employeeDetails: any) => {
     });
     return response;
   } catch (error) {
-    console.error("Error adding a new user employee", error);
+    console.error("Error adding a new employee", error);
+    throw error;
+  }
+};
+
+// Edit employee
+export const editEmployee = async (
+  employee_id: string,
+  employeeDetails: any
+) => {
+  try {
+    const response = await apiService.put(
+      `employee/${employee_id}`,
+      employeeDetails
+    );
+    return response;
+  } catch (error) {
+    console.error("Error updating employee details", error);
+    throw error;
+  }
+};
+
+// Delete employee
+export const deleteEmployee = async (employee_id: string) => {
+  try {
+    const response = await apiService.delete(`employee/${employee_id}`);
+    return response;
+  } catch (error) {
+    console.error("Error deleting employee", error);
     throw error;
   }
 };
@@ -135,6 +163,67 @@ export const getEmployeeDetails = async (empID: string) => {
     return response;
   } catch (error) {
     console.error("Error fetching employee details", error);
+    throw error;
+  }
+};
+
+// Add new property
+export const addProperty = async (propertyDetails: any) => {
+  try {
+    const response = await apiService.post("add-property", propertyDetails);
+    return response;
+  } catch (error) {
+    console.error("Error adding property", error);
+    throw error;
+  }
+};
+
+// Get list of properties
+export const getProperties = async () => {
+  try {
+    const response = await apiService.get("properties");
+    return response;
+  } catch (error) {
+    console.error("Error fetching properties list", error);
+    throw error;
+  }
+};
+
+// Get property details
+export const getPropertyDetails = async (propertyId: string) => {
+  try {
+    const response = await apiService.get(`property/${propertyId}`);
+    return response;
+  } catch (error) {
+    console.error("Error fetching property details", error);
+    throw error;
+  }
+};
+
+// Edit property
+export const editProperty = async (
+  propertyId: string,
+  propertyDetails: any
+) => {
+  try {
+    const response = await apiService.put(
+      `property/${propertyId}`,
+      propertyDetails
+    );
+    return response;
+  } catch (error) {
+    console.error("Error updating property details", error);
+    throw error;
+  }
+};
+
+// Delete property
+export const deleteProperty = async (propertyId: string) => {
+  try {
+    const response = await apiService.delete(`property/${propertyId}`);
+    return response;
+  } catch (error) {
+    console.error("Error deleting property", error);
     throw error;
   }
 };

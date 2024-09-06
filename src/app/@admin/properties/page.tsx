@@ -1,13 +1,13 @@
-import NewEmployeeForm from "./new-employee-form";
-import EmployeesList from "./employees-list";
+import ResidentPropertyForm from "./components/property-forms/resident";
+import MunicipalPropertyForm from "./components/property-forms/municipal";
+import CommercialPropertyForm from "./components/property-forms/commercial";
+import PropertiesList from "./properties-list";
 
 import { Card } from "@/components/ui/card";
 
 import { Separator } from "@/components/ui/separator";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-import Link from "next/link";
 
 import {
   Breadcrumb,
@@ -34,8 +34,8 @@ export default function Page() {
       <Tabs defaultValue="manageEmployee">
         <div className="flex items-center !mb-4">
           <TabsList>
-            <TabsTrigger value="manageEmployee">Manage Employees</TabsTrigger>
-            <TabsTrigger value="addNewEmployee">Add New Employee</TabsTrigger>
+            <TabsTrigger value="manageEmployee">Manage Properties</TabsTrigger>
+            <TabsTrigger value="addNewEmployee">Add New Property</TabsTrigger>
           </TabsList>
         </div>
         <TabsContent value="manageEmployee">
@@ -43,15 +43,15 @@ export default function Page() {
             <div className="hidden space-y-2 p-6 pb-16 md:block">
               <div className="space-y-0.5">
                 <h2 className="text-xl font-semibold tracking-tight">
-                  Manage Employees
+                  Manage Properties
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  Manage & Update Employee details
+                  Manage & Update Property details
                 </p>
               </div>
               <Separator className="my-6" />
               <div className="flex-1 ">
-                <EmployeesList />
+                <PropertiesList />
               </div>
             </div>
           </Card>
@@ -61,7 +61,7 @@ export default function Page() {
             <div className="hidden space-y-2 p-6 pb-16 md:block">
               <div className="space-y-0.5">
                 <h2 className="text-xl font-semibold tracking-tight">
-                  Add New Employee
+                  Add New Property
                 </h2>
                 <p className="text-sm text-muted-foreground">
                   Verify all the details before submission.
@@ -69,7 +69,26 @@ export default function Page() {
               </div>
               <Separator className="my-6" />
               <div className="flex-1 lg:max-w-sm">
-                <NewEmployeeForm />
+                <Tabs defaultValue="residentBuilding">
+                  <div className="flex items-center !mb-4">
+                    <TabsList>
+                      <TabsTrigger value="residentBuilding">
+                        Resident Building
+                      </TabsTrigger>
+                      <TabsTrigger value="commercial">Commercial</TabsTrigger>
+                      <TabsTrigger value="municipal">Municipal</TabsTrigger>
+                    </TabsList>
+                  </div>
+                  <TabsContent value="residentBuilding">
+                    <ResidentPropertyForm />
+                  </TabsContent>
+                  <TabsContent value="commercial">
+                    <CommercialPropertyForm />
+                  </TabsContent>
+                  <TabsContent value="municipal">
+                    <MunicipalPropertyForm />
+                  </TabsContent>
+                </Tabs>
               </div>
             </div>
           </Card>

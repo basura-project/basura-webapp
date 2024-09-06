@@ -7,8 +7,6 @@ import { Separator } from "@/components/ui/separator";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import Link from "next/link";
-
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -27,26 +25,26 @@ export default function Page() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href="/employees">Employees</BreadcrumbLink>
+            <BreadcrumbLink href="/clients">Clients</BreadcrumbLink>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <Tabs defaultValue="manageEmployee">
+      <Tabs defaultValue="manageClients">
         <div className="flex items-center !mb-4">
           <TabsList>
-            <TabsTrigger value="manageEmployee">Manage Employees</TabsTrigger>
-            <TabsTrigger value="addNewEmployee">Add New Employee</TabsTrigger>
+            <TabsTrigger value="manageClients">Manage Clients</TabsTrigger>
+            <TabsTrigger value="addNewClient">Add New Client</TabsTrigger>
           </TabsList>
         </div>
-        <TabsContent value="manageEmployee">
+        <TabsContent value="manageClients">
           <Card x-chunk="dashboard-05-chunk-3">
             <div className="hidden space-y-2 p-6 pb-16 md:block">
               <div className="space-y-0.5">
                 <h2 className="text-xl font-semibold tracking-tight">
-                  Manage Employees
+                  Manage Clients
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  Manage & Update Employee details
+                  Manage & Update Client details
                 </p>
               </div>
               <Separator className="my-6" />
@@ -56,12 +54,12 @@ export default function Page() {
             </div>
           </Card>
         </TabsContent>
-        <TabsContent value="addNewEmployee">
+        <TabsContent value="addNewClient">
           <Card x-chunk="dashboard-05-chunk-3">
             <div className="hidden space-y-2 p-6 pb-16 md:block">
               <div className="space-y-0.5">
                 <h2 className="text-xl font-semibold tracking-tight">
-                  Add New Employee
+                  Add New Client
                 </h2>
                 <p className="text-sm text-muted-foreground">
                   Verify all the details before submission.

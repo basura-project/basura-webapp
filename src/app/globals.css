@@ -67,3 +67,37 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* HTML: <div class="loader"></div> */
+.loader {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  background: linear-gradient(0deg, #01010100 33%, rgb(15 23 42 / 25%) 100%);
+  animation: rotation 1s linear infinite;
+  position: absolute;
+
+  left: calc(50% - 26px);
+  top: calc(50% - 26px);
+}
+.loader::after {
+  content: "";
+  box-sizing: border-box;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+}
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

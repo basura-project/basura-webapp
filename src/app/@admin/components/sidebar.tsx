@@ -36,7 +36,7 @@ export default function Sidebar() {
             height={24}
             alt="Basura Logo"
             className="block dark:hidden"
-          />{" "}
+          />
           <span className="sr-only">Basura</span>
         </Link>
         <TooltipProvider>

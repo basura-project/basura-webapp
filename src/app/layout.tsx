@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { userDetails } from "@/services/index";
 import Cookies from "js-cookie";
 import { Toaster } from "@/components/ui/toaster";
+import Loading from "@/components/ui/loading";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,23 +23,37 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [loaded, setIsLoaded] = useState<boolean>(false);
   const [defaultRoute, setDefaultRoute] = useState<string>("auth");
 
   useEffect(() => {
-    if (Cookies.get("access_token")) {
-      (async function () {
-        try {
-          let res: any = await userDetails();
-          setDefaultRoute(res.data.role);
-          setIsLoading(false);
-        } catch (e: any) {
-          console.log(e);
-        }
-      })();
-    } else {
+    setDefaultRoute("admin");
+    setIsLoaded(true);
+    setTimeout(() => {
       setIsLoading(false);
-      setDefaultRoute("auth");
-    }
+    }, 500);
+
+    // if (Cookies.get("access_token")) {
+    //   (async function () {
+    //     try {
+    //       let res: any = await userDetails();
+    //       setDefaultRoute(res.data.role);
+    //       setIsLoaded(true);
+    //       setTimeout(() => {
+    //         setIsLoading(false);
+    //       }, 500);
+    //     } catch (e: any) {
+    //       setIsLoading(false);
+    //       console.log(e);
+    //     }
+    //   })();
+    // } else {
+    //   setIsLoaded(true);
+    //   setTimeout(() => {
+    //     setIsLoading(false);
+    //   }, 500);
+    //   setDefaultRoute("auth");
+    // }
   }, []);
 
   function role() {
@@ -60,7 +75,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         {children}
-        {!isLoading ? role() : ""}
+        {!isLoading ? role() : <Loading loaded={loaded} />}
         <Toaster />
       </body>
     </html>
