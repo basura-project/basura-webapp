@@ -48,107 +48,108 @@ export default function EmployeesList({
 }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [deleteModalOpen, setDeleteModalOpen] = React.useState<boolean>(false);
+  const [employees, setEmployees] = React.useState([]);
   const { toast } = useToast();
   const router = useRouter();
 
-  let empData: any = [
-    {
-      employee_id: "EMP12345",
-      name: {
-        firstname: "John",
-        middlename: "M",
-        lastname: "Doe",
-      },
-      contact: "+1234567890",
-      email: "john.doe@example.com",
-      username: "john_doe",
-      bank_account_no: "1234567890123456",
-      password: "password123",
-      id_proof: "Base64 encoded file data",
-      profile_photo: "Base64 encoded file data",
-      role: "employee",
-    },
-    {
-      employee_id: "EMP12346",
-      name: {
-        firstname: "John",
-        middlename: "M",
-        lastname: "Doe",
-      },
-      contact: "+1234567890",
-      email: "john.doe@example.com",
-      username: "john_doe",
-      bank_account_no: "1234567890123456",
-      password: "password123",
-      id_proof: "Base64 encoded file data",
-      profile_photo: "Base64 encoded file data",
-      role: "employee",
-    },
-    {
-      employee_id: "EMP12347",
-      name: {
-        firstname: "John",
-        middlename: "M",
-        lastname: "Doe",
-      },
-      contact: "+1234567890",
-      email: "john.doe@example.com",
-      username: "john_doe",
-      bank_account_no: "1234567890123456",
-      password: "password123",
-      id_proof: "Base64 encoded file data",
-      profile_photo: "Base64 encoded file data",
-      role: "employee",
-    },
-    {
-      employee_id: "EMP12348",
-      name: {
-        firstname: "John",
-        middlename: "M",
-        lastname: "Doe",
-      },
-      contact: "+1234567890",
-      email: "john.doe@example.com",
-      username: "john_doe",
-      bank_account_no: "1234567890123456",
-      password: "password123",
-      id_proof: "Base64 encoded file data",
-      profile_photo: "Base64 encoded file data",
-      role: "employee",
-    },
-    {
-      employee_id: "EMP12349",
-      name: {
-        firstname: "John",
-        middlename: "M",
-        lastname: "Doe",
-      },
-      contact: "+1234567890",
-      email: "john.doe@example.com",
-      username: "john_doe",
-      bank_account_no: "1234567890123456",
-      password: "password123",
-      id_proof: "Base64 encoded file data",
-      profile_photo: "Base64 encoded file data",
-      role: "employee",
-    },
-    {
-      employee_id: "EMP12350",
-      name: {
-        firstname: "John",
-        middlename: "M",
-        lastname: "Doe",
-      },
-      contact: "+1234567890",
-      email: "john.doe@example.com",
-      username: "john_doe",
-      bank_account_no: "1234567890123456",
-      password: "password123",
-      id_proof: "Base64 encoded file data",
-      profile_photo: "Base64 encoded file data",
-      role: "employee",
-    },
-  ];
+  // let empData: any = [
+  //   {
+  //     employee_id: "EMP12345",
+  //     name: {
+  //       firstname: "John",
+  //       middlename: "M",
+  //       lastname: "Doe",
+  //     },
+  //     contact: "+1234567890",
+  //     email: "john.doe@example.com",
+  //     username: "john_doe",
+  //     bank_account_no: "1234567890123456",
+  //     password: "password123",
+  //     id_proof: "Base64 encoded file data",
+  //     profile_photo: "Base64 encoded file data",
+  //     role: "employee",
+  //   },
+  //   {
+  //     employee_id: "EMP12346",
+  //     name: {
+  //       firstname: "John",
+  //       middlename: "M",
+  //       lastname: "Doe",
+  //     },
+  //     contact: "+1234567890",
+  //     email: "john.doe@example.com",
+  //     username: "john_doe",
+  //     bank_account_no: "1234567890123456",
+  //     password: "password123",
+  //     id_proof: "Base64 encoded file data",
+  //     profile_photo: "Base64 encoded file data",
+  //     role: "employee",
+  //   },
+  //   {
+  //     employee_id: "EMP12347",
+  //     name: {
+  //       firstname: "John",
+  //       middlename: "M",
+  //       lastname: "Doe",
+  //     },
+  //     contact: "+1234567890",
+  //     email: "john.doe@example.com",
+  //     username: "john_doe",
+  //     bank_account_no: "1234567890123456",
+  //     password: "password123",
+  //     id_proof: "Base64 encoded file data",
+  //     profile_photo: "Base64 encoded file data",
+  //     role: "employee",
+  //   },
+  //   {
+  //     employee_id: "EMP12348",
+  //     name: {
+  //       firstname: "John",
+  //       middlename: "M",
+  //       lastname: "Doe",
+  //     },
+  //     contact: "+1234567890",
+  //     email: "john.doe@example.com",
+  //     username: "john_doe",
+  //     bank_account_no: "1234567890123456",
+  //     password: "password123",
+  //     id_proof: "Base64 encoded file data",
+  //     profile_photo: "Base64 encoded file data",
+  //     role: "employee",
+  //   },
+  //   {
+  //     employee_id: "EMP12349",
+  //     name: {
+  //       firstname: "John",
+  //       middlename: "M",
+  //       lastname: "Doe",
+  //     },
+  //     contact: "+1234567890",
+  //     email: "john.doe@example.com",
+  //     username: "john_doe",
+  //     bank_account_no: "1234567890123456",
+  //     password: "password123",
+  //     id_proof: "Base64 encoded file data",
+  //     profile_photo: "Base64 encoded file data",
+  //     role: "employee",
+  //   },
+  //   {
+  //     employee_id: "EMP12350",
+  //     name: {
+  //       firstname: "John",
+  //       middlename: "M",
+  //       lastname: "Doe",
+  //     },
+  //     contact: "+1234567890",
+  //     email: "john.doe@example.com",
+  //     username: "john_doe",
+  //     bank_account_no: "1234567890123456",
+  //     password: "password123",
+  //     id_proof: "Base64 encoded file data",
+  //     profile_photo: "Base64 encoded file data",
+  //     role: "employee",
+  //   },
+  // ];
 
   React.useEffect(() => {
     (async () => {
@@ -159,6 +160,7 @@ export default function EmployeesList({
             title: "Successful",
             description: "Employees list has been fetched successfully",
           });
+          setEmployees(res.data);
         }
       } catch (e: any) {
         console.log(e);
@@ -218,12 +220,12 @@ export default function EmployeesList({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {empData.map((row: any) => {
+          {employees.map((row: any) => {
             return (
               <TableRow key={row.employee_id}>
                 <TableCell>{row.employee_id}</TableCell>
                 <TableCell>
-                  {row.name.firstname + " " + row.name.lastname}
+                  {row.name && row.name}
                 </TableCell>
                 <TableCell>{row.email}</TableCell>
                 <TableCell>{row.contact}</TableCell>
@@ -238,14 +240,14 @@ export default function EmployeesList({
                       <DropdownMenuContent className="w-16">
                         <DropdownMenuItem
                           className="cursor-pointer"
-                          onClick={() => viewEmployee("TEST")}
+                          onClick={() => viewEmployee(row.employee_id)}
                         >
                           <View size={16} />
                           <span className="pl-2">View</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="cursor-pointer"
-                          onClick={() => editEmployee("TEST")}
+                          onClick={() => editEmployee(row.employee_id)}
                         >
                           <PencilLine size={16} />
                           <span className="pl-2">Edit</span>
@@ -287,7 +289,7 @@ export default function EmployeesList({
                         <AlertDialogAction
                           disabled={isLoading}
                           onClick={() => {
-                            deleteEmployeeById("BS12");
+                            deleteEmployeeById(row.employee_id);
                           }}
                         >
                           {isLoading ? (
