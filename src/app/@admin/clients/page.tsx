@@ -1,5 +1,5 @@
-import NewEmployeeForm from "./new-employee-form";
-import EmployeesList from "./employees-list";
+import NewEmployeeForm from "./new-client-form";
+import ClientList from "./clients-list";
 
 import { Card } from "@/components/ui/card";
 
@@ -49,7 +49,7 @@ export default function Page() {
               </div>
               <Separator className="my-6" />
               <div className="flex-1 ">
-                <EmployeesList />
+                <ClientList />
               </div>
             </div>
           </Card>

@@ -19,29 +19,20 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import { editEmployee } from "@/services/index";
+import { editClient } from "@/services/index";
 
-export default function EditEmployee({ empDetails }: any) {
+export default function EditClient({ clientDetails }: any) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isError, setIsError] = React.useState<string>("");
 
   const formSchema = z
     .object({
-      employeeId: z
+      name: z
         .string()
-        .min(1, { message: "Please enter Employee Id" })
+        .min(1, { message: "Please enter Name" })
         .max(50),
-      firstName: z
-        .string()
-        .min(1, { message: "Please enter first name" })
-        .max(50),
-      middleName: z.string(),
-      lastName: z
-        .string()
-        .min(1, { message: "Please enter last name" })
-        .max(50),
-      contact: z
+      phone: z
         .string()
         .min(1, { message: "Please enter contact number" })
         .max(50),
@@ -49,33 +40,17 @@ export default function EditEmployee({ empDetails }: any) {
         .string()
         .min(1, { message: "Please enter email" })
         .email("This is not a valid email."),
-      bankAccountNo: z
-        .string()
-        .min(1, { message: "Please enter bank account number" })
-        .max(50),
       username: z.string().min(1, { message: "Please enter username" }).max(50),
       password: z.string().min(1, { message: "Please enter password" }).max(50),
-      confirmPassword: z
-        .string()
-        .min(1, { message: "Please confirm password" })
-        .max(50),
     })
-    .refine((data) => data.password === data.confirmPassword, {
-      message: "Passwords don't match",
-      path: ["confirmPassword"], // path of error
-    });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      employeeId: empDetails.employee_id,
-      firstName: empDetails.name.firstname,
-      middleName: empDetails.name.middlename,
-      lastName: empDetails.name.lastname,
-      contact: empDetails.contact,
-      email: empDetails.email,
-      bankAccountNo: empDetails.bank_account_no,
-      username: empDetails.username,
+      name: clientDetails.client_name,
+      phone: clientDetails.phone,
+      email: clientDetails.email,
+      username: clientDetails.username,
     },
   });
 
@@ -85,22 +60,18 @@ export default function EditEmployee({ empDetails }: any) {
     setIsError("");
 
     try {
-      let employeeDetails = {
-        name: {
-          firstname: values.firstName,
-          middlename: values.middleName,
-          lastname: values.lastName,
-        },
-        contact: values.contact,
+      let clientDetailsForm = {
+        client_id: clientDetails.client_id,
+        client_name: values.name,
+        phone: values.phone,
         email: values.email,
-        bank_account_no: values.bankAccountNo,
-        role: "employee",
+        username: values.username,
       };
-      let res = await editEmployee(empDetails.employee_id, employeeDetails);
+      let res = await editClient(clientDetails.client_id, clientDetailsForm);
       if (res) {
         toast({
           title: "Successful",
-          description: "Employee details submitted successfully",
+          description: "Client details submitted successfully",
         });
       }
       setIsLoading(false);
@@ -122,36 +93,14 @@ export default function EditEmployee({ empDetails }: any) {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
         <FormField
           control={form.control}
-          name="employeeId"
+          name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Employee Id</FormLabel>
+              <FormLabel>Client Name</FormLabel>
               <FormControl>
                 <Input
-                  id="employeeId"
-                  placeholder="Employee Id"
-                  type="text"
-                  autoCapitalize="none"
-                  autoComplete="employeeId"
-                  autoCorrect="off"
-                  disabled={true}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="firstName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>First Name</FormLabel>
-              <FormControl>
-                <Input
-                  id="firstName"
-                  placeholder="First Name"
+                  id="Name"
+                  placeholder="Name"
                   type="text"
                   autoCapitalize="none"
                   autoCorrect="off"
@@ -165,56 +114,14 @@ export default function EditEmployee({ empDetails }: any) {
         />
         <FormField
           control={form.control}
-          name="middleName"
+          name="phone"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Middle Name</FormLabel>
+              <FormLabel>Client Phone No</FormLabel>
               <FormControl>
                 <Input
-                  id="middleName"
-                  placeholder="Middle Name"
-                  type="text"
-                  autoCapitalize="none"
-                  autoCorrect="off"
-                  disabled={isLoading}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="lastName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Last Name</FormLabel>
-              <FormControl>
-                <Input
-                  id="lastName"
-                  placeholder="Last Name"
-                  type="text"
-                  autoCapitalize="none"
-                  autoCorrect="off"
-                  disabled={isLoading}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="contact"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Contact</FormLabel>
-              <FormControl>
-                <Input
-                  id="contact"
-                  placeholder="Contact"
+                  id="phone"
+                  placeholder="+1 XXXXXXXXX"
                   type="text"
                   autoCapitalize="none"
                   autoCorrect="off"
@@ -231,33 +138,12 @@ export default function EditEmployee({ empDetails }: any) {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>Email Id</FormLabel>
               <FormControl>
                 <Input
                   id="email"
                   placeholder="Email"
                   type="email"
-                  autoCapitalize="none"
-                  autoCorrect="off"
-                  disabled={isLoading}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="bankAccountNo"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Bank Account No</FormLabel>
-              <FormControl>
-                <Input
-                  id="bankAccountNo"
-                  placeholder="Bank Account No"
-                  type="text"
                   autoCapitalize="none"
                   autoCorrect="off"
                   disabled={isLoading}

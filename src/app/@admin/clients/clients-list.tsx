@@ -4,7 +4,7 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
-import { getEmployees, deleteEmployee } from "@/services/index";
+import { getClients, deleteClient } from "@/services/index";
 import { useRouter } from "next/navigation";
 import { Icons } from "@/components/ui/icons";
 
@@ -42,123 +42,26 @@ import {
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export default function EmployeesList({
+export default function ClientList({
   className,
   ...props
 }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [deleteModalOpen, setDeleteModalOpen] = React.useState<boolean>(false);
+  const [clients, setClients] = React.useState([]);
   const { toast } = useToast();
   const router = useRouter();
-
-  let empData: any = [
-    {
-      employee_id: "EMP12345",
-      name: {
-        firstname: "John",
-        middlename: "M",
-        lastname: "Doe",
-      },
-      contact: "+1234567890",
-      email: "john.doe@example.com",
-      username: "john_doe",
-      bank_account_no: "1234567890123456",
-      password: "password123",
-      id_proof: "Base64 encoded file data",
-      profile_photo: "Base64 encoded file data",
-      role: "employee",
-    },
-    {
-      employee_id: "EMP12346",
-      name: {
-        firstname: "John",
-        middlename: "M",
-        lastname: "Doe",
-      },
-      contact: "+1234567890",
-      email: "john.doe@example.com",
-      username: "john_doe",
-      bank_account_no: "1234567890123456",
-      password: "password123",
-      id_proof: "Base64 encoded file data",
-      profile_photo: "Base64 encoded file data",
-      role: "employee",
-    },
-    {
-      employee_id: "EMP12347",
-      name: {
-        firstname: "John",
-        middlename: "M",
-        lastname: "Doe",
-      },
-      contact: "+1234567890",
-      email: "john.doe@example.com",
-      username: "john_doe",
-      bank_account_no: "1234567890123456",
-      password: "password123",
-      id_proof: "Base64 encoded file data",
-      profile_photo: "Base64 encoded file data",
-      role: "employee",
-    },
-    {
-      employee_id: "EMP12348",
-      name: {
-        firstname: "John",
-        middlename: "M",
-        lastname: "Doe",
-      },
-      contact: "+1234567890",
-      email: "john.doe@example.com",
-      username: "john_doe",
-      bank_account_no: "1234567890123456",
-      password: "password123",
-      id_proof: "Base64 encoded file data",
-      profile_photo: "Base64 encoded file data",
-      role: "employee",
-    },
-    {
-      employee_id: "EMP12349",
-      name: {
-        firstname: "John",
-        middlename: "M",
-        lastname: "Doe",
-      },
-      contact: "+1234567890",
-      email: "john.doe@example.com",
-      username: "john_doe",
-      bank_account_no: "1234567890123456",
-      password: "password123",
-      id_proof: "Base64 encoded file data",
-      profile_photo: "Base64 encoded file data",
-      role: "employee",
-    },
-    {
-      employee_id: "EMP12350",
-      name: {
-        firstname: "John",
-        middlename: "M",
-        lastname: "Doe",
-      },
-      contact: "+1234567890",
-      email: "john.doe@example.com",
-      username: "john_doe",
-      bank_account_no: "1234567890123456",
-      password: "password123",
-      id_proof: "Base64 encoded file data",
-      profile_photo: "Base64 encoded file data",
-      role: "employee",
-    },
-  ];
 
   React.useEffect(() => {
     (async () => {
       try {
-        let res = await getEmployees();
+        let res = await getClients();
         if (res) {
           toast({
             title: "Successful",
-            description: "Employees list has been fetched successfully",
+            description: "Clients list has been fetched successfully",
           });
+          setClients(res.data);
         }
       } catch (e: any) {
         console.log(e);
@@ -166,12 +69,12 @@ export default function EmployeesList({
     })();
   }, []);
 
-  function viewEmployee(empId: string) {
-    router.push(`employees/view/${empId}`);
+  function viewClient(clientId: string) {
+    router.push(`clients/view/${clientId}`);
   }
 
-  function editEmployee(empId: string) {
-    router.push(`employees/edit/${empId}`);
+  function editClient(clientId: string) {
+    router.push(`clients/edit/${clientId}`);
   }
 
   function openDeleteModal() {
@@ -182,14 +85,14 @@ export default function EmployeesList({
     setDeleteModalOpen(false);
   }
 
-  async function deleteEmployeeById(empId: string) {
+  async function deleteClientById(clientID: string) {
     setIsLoading(true);
     try {
-      let res: any = await deleteEmployee(empId);
+      let res: any = await deleteClient(clientID);
       if (res) {
         toast({
           title: "Successful",
-          description: `Employee ${empId} has been deleted successfully`,
+          description: `Employee ${clientID} has been deleted successfully`,
         });
       }
       setIsLoading(false);
@@ -210,23 +113,25 @@ export default function EmployeesList({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Employee Id</TableHead>
+            <TableHead>Client Id</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Email</TableHead>
+            <TableHead>Client Type</TableHead>
             <TableHead>Phone No</TableHead>
             <TableHead className="text-right">Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {empData.map((row: any) => {
+          {clients.map((row: any) => {
             return (
-              <TableRow key={row.employee_id}>
-                <TableCell>{row.employee_id}</TableCell>
+              <TableRow key={row.client_id}>
+                <TableCell>{row.client_id}</TableCell>
                 <TableCell>
-                  {row.name.firstname + " " + row.name.lastname}
+                  {row.client_name}
                 </TableCell>
                 <TableCell>{row.email}</TableCell>
-                <TableCell>{row.contact}</TableCell>
+                <TableCell>Client Type</TableCell>
+                <TableCell>{row.phone}</TableCell>
                 <TableCell className="text-right">
                   <AlertDialog open={deleteModalOpen}>
                     <DropdownMenu>
@@ -238,14 +143,14 @@ export default function EmployeesList({
                       <DropdownMenuContent className="w-16">
                         <DropdownMenuItem
                           className="cursor-pointer"
-                          onClick={() => viewEmployee("TEST")}
+                          onClick={() => viewClient(row.client_id)}
                         >
                           <View size={16} />
                           <span className="pl-2">View</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="cursor-pointer"
-                          onClick={() => editEmployee("TEST")}
+                          onClick={() => editClient(row.client_id)}
                         >
                           <PencilLine size={16} />
                           <span className="pl-2">Edit</span>
@@ -273,7 +178,7 @@ export default function EmployeesList({
                         </AlertDialogTitle>
                         <AlertDialogDescription>
                           This action cannot be undone. This will permanently
-                          delete the employee and remove the data.
+                          delete the client and remove the data.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
@@ -287,7 +192,7 @@ export default function EmployeesList({
                         <AlertDialogAction
                           disabled={isLoading}
                           onClick={() => {
-                            deleteEmployeeById("BS12");
+                            deleteClientById(row.client_id);
                           }}
                         >
                           {isLoading ? (

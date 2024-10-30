@@ -227,3 +227,113 @@ export const deleteProperty = async (propertyId: string) => {
     throw error;
   }
 };
+
+//Get Clients
+export const getClients = async () => {
+  try {
+    const response = await apiService.get("clients");
+    return response;
+  } catch (error) {
+    console.error("Error fetching clients list", error);
+    throw error;
+  }
+};
+
+// Get employee details
+export const getClientDetails = async (clientID: string) => {
+  try {
+    const response = await apiService.get(`client/${clientID}`);
+    return response;
+  } catch (error) {
+    console.error("Error fetching employee details", error);
+    throw error;
+  }
+};
+
+// Add new Client
+export const addClient = async (clientDetails: any) => {
+  try {
+    const response = await apiService.post("add-client", clientDetails, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("Error adding a new employee", error);
+    throw error;
+  }
+};
+
+// Edit Client
+export const editClient = async (
+  client_id: string,
+  clientDetails: any
+) => {
+  try {
+    const response = await apiService.put(
+      `client/${client_id}`,
+      clientDetails
+    );
+    return response;
+  } catch (error) {
+    console.error("Error updating employee details", error);
+    throw error;
+  }
+};
+
+// Delete Client
+export const deleteClient = async (client_id: string) => {
+  try {
+    const response = await apiService.delete(`client/${client_id}`);
+    return response;
+  } catch (error) {
+    console.error("Error deleting employee", error);
+    throw error;
+  }
+};
+
+
+//Get Garbage attributes
+export const getGarbageAttributes = async () => {
+  try {
+    const response = await apiService.get("garbage-attributes");
+    return response;
+  } catch (error) {
+    console.error("Error fetching garbage attributes", error);
+    throw error;
+  }
+};
+
+// Add a garbage attribute
+export const addGarbageAttribute = async (garbageAttribute: object) => {
+  try {
+    const response = await apiService.post("garbage-attribute", garbageAttribute, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("Error adding a garbage attribute", error);
+    throw error;
+  }
+};
+
+// Edit a garbage attribute
+
+export const editGarbageAttribute = async (
+  garbageAttribute_name: string,
+  garbageAttribute: object
+) => {
+  try {
+    const response = await apiService.put(
+      `garbage-attributes/${garbageAttribute_name}`,
+      garbageAttribute
+    );
+    return response;
+  } catch (error) {
+    console.error("Error updating garbage attribute", error);
+    throw error;
+  }
+};

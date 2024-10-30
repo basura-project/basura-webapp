@@ -35,7 +35,7 @@ export default function ResidentPropertyForm({
   const { toast } = useToast();
 
   const formSchema = z.object({
-    propertyType: z.string(),
+    propertyType: z.string().optional(),
     propertyId: z
       .string()
       .min(1, { message: "Please enter property id" })
@@ -644,9 +644,6 @@ export default function ResidentPropertyForm({
             </Button>
 
             <Button
-              onClick={() => {
-                console.log(form.formState.errors);
-              }}
               className="!mt-3"
               disabled={isLoading}
             >

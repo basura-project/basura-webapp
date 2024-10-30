@@ -18,13 +18,21 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { MultiSelect } from "@/components/ui/multi-select";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
-import { addEmployee } from "@/services/index";
+import { addClient } from "@/services/index";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export default function NewEmployeeForm({
+export default function NewClientForm({
   className,
   ...props
 }: UserAuthFormProps) {
@@ -35,31 +43,23 @@ export default function NewEmployeeForm({
 
   const formSchema = z
     .object({
-      employeeId: z
+      clientID: z
         .string()
-        .min(1, { message: "Please enter Employee Id" })
+        .min(1, { message: "Please enter Client Id" })
         .max(50),
-      firstName: z
+      name: z
         .string()
-        .min(1, { message: "Please enter first name" })
+        .min(1, { message: "Please enter Client Name" })
         .max(50),
-      middleName: z.string(),
-      lastName: z
+      phone: z
         .string()
-        .min(1, { message: "Please enter last name" })
-        .max(50),
-      contact: z
-        .string()
-        .min(1, { message: "Please enter contact number" })
+        .min(1, { message: "Please enter Client phone number" })
         .max(50),
       email: z
         .string()
         .min(1, { message: "Please enter email" })
         .email("This is not a valid email."),
-      bankAccountNo: z
-        .string()
-        .min(1, { message: "Please enter bank account number" })
-        .max(50),
+      properties: z.array(z.string()).min(1, { message: "Please select a property" }).default([]),
       username: z.string().min(1, { message: "Please enter username" }).max(50),
       password: z.string().min(1, { message: "Please enter password" }).max(50),
       confirmPassword: z
@@ -75,13 +75,11 @@ export default function NewEmployeeForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      employeeId: "",
-      firstName: "",
-      middleName: "",
-      lastName: "",
-      contact: "",
+      clientID: "",
+      name: "",
+      phone: "",
       email: "",
-      bankAccountNo: "",
+      properties: [],
       username: "",
       password: "",
       confirmPassword: "",
@@ -93,19 +91,16 @@ export default function NewEmployeeForm({
     setIsError("");
 
     try {
-      let employeeDetails = {
-        employee_id: values.employeeId,
-        firstname: values.firstName,
-        middlename: values.middleName,
-        lastname: values.lastName,
-        contact: values.contact,
+      let clientDetails = {
+        client_id: values.clientID,
+        client_name: values.name,
+        phone: values.phone,
         email: values.email,
-        bank_account_no: values.bankAccountNo,
+        properties: values.properties,
         username: values.username,
         password: values.password,
-        role: "employee",
       };
-      let res = await addEmployee(employeeDetails);
+      let res = await addClient(clientDetails);
       if (res) {
         toast({
           title: "Successful",
@@ -126,23 +121,29 @@ export default function NewEmployeeForm({
     form.reset();
   }
 
+  const properiesMockData = [
+    { value: "PROP12345", label: "PROP12345" },
+    { value: "PROP12346", label: "PROP12345" },
+    { value: "PROP12347", label: "PROP12347"}
+  ];
+
   return (
     <div className={cn("grid gap-2", className)} {...props}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
           <FormField
             control={form.control}
-            name="employeeId"
+            name="clientID"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Employee Id</FormLabel>
+                <FormLabel>Client Id</FormLabel>
                 <FormControl>
                   <Input
-                    id="employeeId"
-                    placeholder="Employee Id"
+                    id="clientID"
+                    placeholder="Client Id"
                     type="text"
                     autoCapitalize="none"
-                    autoComplete="employeeId"
+                    autoComplete="clientID"
                     autoCorrect="off"
                     disabled={isLoading}
                     {...field}
@@ -154,35 +155,14 @@ export default function NewEmployeeForm({
           />
           <FormField
             control={form.control}
-            name="firstName"
+            name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>First Name</FormLabel>
+                <FormLabel>Client Name</FormLabel>
                 <FormControl>
                   <Input
-                    id="firstName"
-                    placeholder="First Name"
-                    type="text"
-                    autoCapitalize="none"
-                    autoCorrect="off"
-                    disabled={isLoading}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="middleName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Middle Name</FormLabel>
-                <FormControl>
-                  <Input
-                    id="middleName"
-                    placeholder="Middle Name"
+                    id="name"
+                    placeholder="Client Name"
                     type="text"
                     autoCapitalize="none"
                     autoCorrect="off"
@@ -196,36 +176,15 @@ export default function NewEmployeeForm({
           />
           <FormField
             control={form.control}
-            name="lastName"
+            name="phone"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Last Name</FormLabel>
+                <FormLabel>Client Phone No</FormLabel>
                 <FormControl>
                   <Input
-                    id="lastName"
-                    placeholder="Last Name"
-                    type="text"
-                    autoCapitalize="none"
-                    autoCorrect="off"
-                    disabled={isLoading}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="contact"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Contact</FormLabel>
-                <FormControl>
-                  <Input
-                    id="contact"
-                    placeholder="Contact"
-                    type="text"
+                    id="phone"
+                    placeholder="+1 XXXXXXXXX"
+                    type="number"
                     autoCapitalize="none"
                     autoCorrect="off"
                     disabled={isLoading}
@@ -241,7 +200,7 @@ export default function NewEmployeeForm({
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>Email Id</FormLabel>
                 <FormControl>
                   <Input
                     id="email"
@@ -259,21 +218,32 @@ export default function NewEmployeeForm({
           />
           <FormField
             control={form.control}
-            name="bankAccountNo"
+            name="properties"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Bank Account No</FormLabel>
-                <FormControl>
-                  <Input
-                    id="bankAccountNo"
-                    placeholder="Bank Account No"
-                    type="text"
-                    autoCapitalize="none"
-                    autoCorrect="off"
-                    disabled={isLoading}
-                    {...field}
-                  />
-                </FormControl>
+                <FormLabel>Properties</FormLabel>
+                {/* <Select
+                  onValueChange={(value) => field.onChange(value)}
+                  defaultValue={field.value?.[0] ?? ""}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="m@example.com">m@example.com</SelectItem>
+                    <SelectItem value="m@google.com">m@google.com</SelectItem>
+                    <SelectItem value="m@support.com">m@support.com</SelectItem>
+                  </SelectContent>
+                </Select> */}
+                <MultiSelect
+                  options={properiesMockData}
+                  onValueChange={(value) => field.onChange(value)}
+                  placeholder="Select"
+                  variant="inverted"
+                  animation={2}
+                />
                 <FormMessage />
               </FormItem>
             )}

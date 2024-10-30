@@ -33,27 +33,27 @@ export default function RootLayout({
       setIsLoading(false);
     }, 500);
 
-    // if (Cookies.get("access_token")) {
-    //   (async function () {
-    //     try {
-    //       let res: any = await userDetails();
-    //       setDefaultRoute(res.data.role);
-    //       setIsLoaded(true);
-    //       setTimeout(() => {
-    //         setIsLoading(false);
-    //       }, 500);
-    //     } catch (e: any) {
-    //       setIsLoading(false);
-    //       console.log(e);
-    //     }
-    //   })();
-    // } else {
-    //   setIsLoaded(true);
-    //   setTimeout(() => {
-    //     setIsLoading(false);
-    //   }, 500);
-    //   setDefaultRoute("auth");
-    // }
+    if (Cookies.get("access_token")) {
+      (async function () {
+        try {
+          let res: any = await userDetails();
+          setDefaultRoute(res.data.role);
+          setIsLoaded(true);
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 500);
+        } catch (e: any) {
+          setIsLoading(false);
+          console.log(e);
+        }
+      })();
+    } else {
+      setIsLoaded(true);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 500);
+      setDefaultRoute("auth");
+    }
   }, []);
 
   function role() {
