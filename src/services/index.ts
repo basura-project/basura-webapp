@@ -298,17 +298,18 @@ export const deleteClient = async (client_id: string) => {
 export const getGarbageAttributes = async () => {
   try {
     const response = await apiService.get("garbage-attributes");
-    return response;
+    return response?.status === 200 ? response.data : null;
   } catch (error) {
     console.error("Error fetching garbage attributes", error);
-    throw error;
+    throw new Error("Failed to fetch garbage attributes");
   }
 };
 
+
 // Add a garbage attribute
-export const addGarbageAttribute = async (garbageAttribute: object) => {
+export const addGarbageAttribute = async (garbageAttribute: any) => {
   try {
-    const response = await apiService.post("garbage-attribute", garbageAttribute, {
+    const response = await apiService.post("garbage-attributes", garbageAttribute, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -334,6 +335,18 @@ export const editGarbageAttribute = async (
     return response;
   } catch (error) {
     console.error("Error updating garbage attribute", error);
+    throw error;
+  }
+};
+
+// Delete a garbage attribute
+
+export const deleteGarbageAttribute = async (garbageAttribute_name: string) => {
+  try {
+    const response = await apiService.delete(`garbage-attributes/${garbageAttribute_name}`);
+    return response;
+  } catch (error) {
+    console.error("Error deleting garbage attribute", error);
     throw error;
   }
 };

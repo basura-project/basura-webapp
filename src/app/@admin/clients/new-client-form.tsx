@@ -121,7 +121,7 @@ export default function NewClientForm({
     form.reset();
   }
 
-  const properiesMockData = [
+  const propertiesMockData = [
     { value: "PROP12345", label: "PROP12345" },
     { value: "PROP12346", label: "PROP12345" },
     { value: "PROP12347", label: "PROP12347"}
@@ -238,7 +238,7 @@ export default function NewClientForm({
                   </SelectContent>
                 </Select> */}
                 <MultiSelect
-                  options={properiesMockData}
+                  options={propertiesMockData}
                   onValueChange={(value) => field.onChange(value)}
                   placeholder="Select"
                   variant="inverted"
