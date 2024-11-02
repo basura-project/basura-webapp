@@ -137,10 +137,10 @@ export default function GarbageAttributeForm({
               name="color"
               render={({ field }) => (
                 <FormItem className="flex items-center space-x-2">
-                  <FormLabel htmlFor="color">Color</FormLabel>
+                  <FormLabel htmlFor="Color">Color</FormLabel>
                   <FormControl>
                     <Input
-                      id="color"
+                      id="Color"
                       type="color"
                       disabled={isLoading}
                       {...field}

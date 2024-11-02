@@ -44,7 +44,7 @@ export default function GarbageAttributeList({
     "add" | "edit" | "delete" | null
   >(null);
   const [selectedAttribute, setSelectedAttribute] = React.useState<any>(null);
-  const { data, isLoading, error, setData } = usePreloader(getGarbageAttributes);
+  const { data, isLoading, error, setData } = usePreloader(getGarbageAttributes, "Attribute list");
 
   const { toast } = useToast();
 

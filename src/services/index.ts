@@ -91,6 +91,13 @@ export const login = async (userDetails: any) => {
   }
 };
 
+// Logout function
+export const logout = () => {
+  Cookies.remove("access_token");
+  Cookies.remove("refresh_token");
+  window.location.href = "/";
+};
+
 // User details
 export const userDetails = async () => {
   try {
@@ -347,6 +354,22 @@ export const deleteGarbageAttribute = async (garbageAttribute_name: string) => {
     return response;
   } catch (error) {
     console.error("Error deleting garbage attribute", error);
+    throw error;
+  }
+};
+
+// Add a garbage entry
+
+export const addGarbageEntry = async (garbage_entry: any) => {
+  try {
+    const response = await apiService.post("add-entry", garbage_entry, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("Error adding a garbage entry", error);
     throw error;
   }
 };

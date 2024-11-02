@@ -20,7 +20,7 @@ import {
 export default function Page() {
   return (
     <>
-      <Breadcrumb className="hidden md:flex -mt-[44px] z-50">
+      <Breadcrumb className="hidden md:flex -mt-[44px] z-50 max-w-max">
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
