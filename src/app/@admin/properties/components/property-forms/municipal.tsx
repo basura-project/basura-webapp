@@ -22,12 +22,24 @@ import {
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/components/ui/use-toast";
-import { addProperty } from "@/services/index";
+import { suggestID, addProperty } from "@/services/index";
 
 export default function MunicipalPropertyForm({ className, ...props }: any) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isError, setIsError] = React.useState<string>("");
   const { toast } = useToast();
+
+  React.useEffect(() => {
+    const fetchSuggestedId = async () => {
+     try {
+       const response = await suggestID('property');
+       form.setValue("propertyId", response.data.suggested_property_id)
+     } catch (err) {
+       console.error(err);
+     }
+    };
+    fetchSuggestedId();
+ },[]);
 
   const formSchema = z.object({
     propertyId: z

@@ -2,13 +2,9 @@
 
 import * as React from "react";
 
-import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import {
-  getGarbageAttributes,
-  editGarbageAttribute,
-  addGarbageAttribute,
-  deleteGarbageAttribute,
+  getGarbageAttributes
 } from "@/services/index";
 import { useRouter } from "next/navigation";
 import { Icons } from "@/components/ui/icons";
@@ -44,7 +40,7 @@ export default function GarbageAttributeList({
     "add" | "edit" | "delete" | null
   >(null);
   const [selectedAttribute, setSelectedAttribute] = React.useState<any>(null);
-  const { data, isLoading, error, setData } = usePreloader(getGarbageAttributes, "Attribute list");
+  const { data, isDataLoading, error, setData } = usePreloader(getGarbageAttributes, "Attribute list");
 
   const { toast } = useToast();
 
@@ -104,7 +100,7 @@ export default function GarbageAttributeList({
 
   return (
     <div className="flex flex-row flex-wrap gap-x-6">
-      {isLoading ? (
+      {isDataLoading ? (
         <Icons.spinner className="mx-auto my-4 h-6 w-6 animate-spin" />
       ) : (
         <>

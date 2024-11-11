@@ -68,7 +68,7 @@ export default function EditClient({ clientDetails }: any) {
       email: clientDetails.email,
       username: clientDetails.username,
       password: "",
-      properties: clientDetails.properties
+      properties: []
     },
   });
 
@@ -85,6 +85,7 @@ export default function EditClient({ clientDetails }: any) {
         email: values.email,
         username: values.username,
         password: values.password,
+        properties: values.properties
       };
       let res = await editClient(clientDetails.client_id, clientDetailsForm);
       if (res) {
@@ -109,7 +110,7 @@ export default function EditClient({ clientDetails }: any) {
 
   const propertiesMockData = [
     { value: "PROP12345", label: "PROP12345" },
-    { value: "PROP12346", label: "PROP12345" },
+    { value: "PROP12346", label: "PROP12346" },
     { value: "PROP12347", label: "PROP12347"}
   ];
 
@@ -210,6 +211,7 @@ export default function EditClient({ clientDetails }: any) {
               <FormControl>
                 <MultiSelect
                     options={propertiesMockData}
+                    defaultValue={clientDetails.properties}
                     onValueChange={(value) => field.onChange(value)}
                     placeholder="Select"
                     variant="inverted"

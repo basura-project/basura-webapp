@@ -109,6 +109,19 @@ export const userDetails = async () => {
   }
 };
 
+// Suggest employee ID
+
+export const suggestID = async (type: string) => {
+  try {
+    const response = await apiService.get(`${type}-id/suggest`);
+    return response;
+  } catch (error) {
+    console.error(`Error fetching suggested ${type} ID`, error);
+    throw error;
+  }
+};
+
+
 // Add new employee
 export const addEmployee = async (employeeDetails: any) => {
   try {
@@ -155,8 +168,8 @@ export const deleteEmployee = async (employee_id: string) => {
 // Get list of employees
 export const getEmployees = async () => {
   try {
-    const response = await apiService.get("employees");
-    return response;
+    const response = await apiService.get("employees", { params: { sort_by: 'employee_id', sort_order: 'desc' }});
+    return response.data;
   } catch (error) {
     console.error("Error fetching employees list", error);
     throw error;
@@ -188,8 +201,8 @@ export const addProperty = async (propertyDetails: any) => {
 // Get list of properties
 export const getProperties = async () => {
   try {
-    const response = await apiService.get("properties");
-    return response;
+    const response = await apiService.get("properties", { params: { sort_by: 'property_id', sort_order: 'asc' }});
+    return response.data;
   } catch (error) {
     console.error("Error fetching properties list", error);
     throw error;
@@ -238,8 +251,8 @@ export const deleteProperty = async (propertyId: string) => {
 //Get Clients
 export const getClients = async () => {
   try {
-    const response = await apiService.get("clients");
-    return response;
+    const response = await apiService.get("clients", { params: { sort_by: 'client_id', sort_order: 'asc' }});
+    return response.data;
   } catch (error) {
     console.error("Error fetching clients list", error);
     throw error;
@@ -250,6 +263,7 @@ export const getClients = async () => {
 export const getClientDetails = async (clientID: string) => {
   try {
     const response = await apiService.get(`client/${clientID}`);
+    console.log(response);
     return response;
   } catch (error) {
     console.error("Error fetching employee details", error);

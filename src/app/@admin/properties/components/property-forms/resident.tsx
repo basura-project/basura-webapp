@@ -21,8 +21,9 @@ import {
 } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/components/ui/use-toast";
-import { addProperty, editProperty } from "@/services/index";
+import { suggestID, addProperty, editProperty } from "@/services/index";
 
 export default function ResidentPropertyForm({
   className,
@@ -33,6 +34,18 @@ export default function ResidentPropertyForm({
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isError, setIsError] = React.useState<string>("");
   const { toast } = useToast();
+
+  React.useEffect(() => {
+    const fetchSuggestedId = async () => {
+     try {
+       const response = await suggestID('property');
+       form.setValue("propertyId", response.data.suggested_property_id)
+     } catch (err) {
+       console.error(err);
+     }
+    };
+    fetchSuggestedId();
+ },[]);
 
   const formSchema = z.object({
     propertyType: z.string().optional(),
@@ -69,6 +82,7 @@ export default function ResidentPropertyForm({
     chuteFloorLevel: z.coerce.number({
       message: "Please enter floor level",
     }),
+    chuteFloorAll: z.coerce.boolean().optional(),
     noOfFloors: z.coerce.number({
       message: "Please enter the no. of floors",
     }),
@@ -103,6 +117,7 @@ export default function ResidentPropertyForm({
       streetName: propertyDetails.street_name,
       buildingNo: propertyDetails.building_number,
       chutePresent: propertyDetails.chute_present === true ? "Yes" : "No",
+      chuteFloorAll: propertyDetails.chute_floor_all,
       chuteFloorLevel: propertyDetails.chute_floor_level,
       noOfFloors: propertyDetails.number_of_floors,
       noOfBasementFloors: propertyDetails.number_of_basement_floors,
@@ -124,6 +139,7 @@ export default function ResidentPropertyForm({
       buildingNo: "",
       chutePresent: "No",
       chuteFloorLevel: 0,
+      chuteFloorAll: false,
       noOfFloors: 0,
       noOfBasementFloors: 0,
       noOfUnitsPerFloor: 0,
@@ -155,6 +171,7 @@ export default function ResidentPropertyForm({
         building_number: values.buildingNo,
         chute_present: values.chutePresent == "Yes" ? true : false,
         chute_floor_level: values.chuteFloorLevel,
+        chute_floor_all: values.chuteFloorAll,
         number_of_floors: values.noOfFloors,
         number_of_basement_floors: values.noOfBasementFloors,
         number_of_units_per_floor: values.noOfUnitsPerFloor,
@@ -233,6 +250,25 @@ export default function ResidentPropertyForm({
               </FormItem>
             )}
           />
+          <FormField
+          control={form.control}
+          name="chuteFloorAll"
+          render={({ field }) => (
+            <FormItem className="flex space-x-3 space-y-0 mt-3">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>
+                  Chute present on all floors
+                </FormLabel>
+              </div>
+            </FormItem>
+          )}
+        />
         </div>
       </>
     ) : (

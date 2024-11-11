@@ -21,6 +21,8 @@ export default function ViewClient({ params: { clientID } }: any) {
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [isError, setIsError] = React.useState<string>("");
   const [clientDetails, setClientDetails] = React.useState<any>({});
+  const [showAll, setShowAll] = React.useState(false);
+
 
   React.useEffect(() => {
     (async () => {
@@ -38,6 +40,8 @@ export default function ViewClient({ params: { clientID } }: any) {
       }
     })();
   }, [isLoading]);
+
+  const showAllProperties = () => setShowAll(true);
 
   const {client_id, client_name, phone, email, username, properties} = clientDetails
 
@@ -89,19 +93,22 @@ export default function ViewClient({ params: { clientID } }: any) {
               </div>
               <div className="mb-3">
                 <p className="font-medium">Properties :</p>
-                <p className="font-normal">
-                  <ul>
-                  {
-                    properties.map((propertyID : string, index: number) => (
-                      <li key={Number(propertyID)}>
-                        <p className="text-sm">
-                          #{propertyID}{properties.length > 2 && index >= 2 ? `+${properties.length - 2}` : ""}
-                        </p>
-                      </li>
-                    ))
-                  }
-                  </ul>
-                </p>
+                <ul className="flex items-center flex-wrap">
+                  {(showAll ? properties : properties.slice(0, 2)).map((propertyID: string, index: number) => (
+                    <li key={propertyID} className="mr-2">
+                      <p className="text-sm">
+                        {index > 0 && ", "}#{propertyID}
+                      </p>
+                    </li>
+                  ))}
+                  {!showAll && properties.length > 2 && (
+                    <li>
+                      <Button onClick={showAllProperties} variant="secondary" className="ml-2 p-2 h-6">
+                        +{properties.length - 2}
+                      </Button>
+                    </li>
+                  )}
+                </ul>
               </div>
               <div className="mb-3">
                 <p className="font-medium">User Name :</p>

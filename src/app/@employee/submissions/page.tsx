@@ -37,7 +37,6 @@ const SubmissionsPage = () => {
     clientType: "Client Type",
     clientName: "Client Name",
     details: "Borough Name, Street Name, Building Number",
-    status: "In progress",
   }));
 
   return (
@@ -66,7 +65,6 @@ const SubmissionsPage = () => {
                 <TableHead>Client Type</TableHead>
                 <TableHead>Client Name</TableHead>
                 <TableHead>Details</TableHead>
-                <TableHead>Status</TableHead>
                 <TableHead></TableHead>
               </TableRow>
             </TableHeader>
@@ -86,12 +84,6 @@ const SubmissionsPage = () => {
                     </Button>
                   </TableCell>
                   <TableCell>{submission.details}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <Timer className="h-4 w-4 text-gray-500 mr-1" />
-                      <span>{submission.status}</span>
-                    </div>
-                  </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

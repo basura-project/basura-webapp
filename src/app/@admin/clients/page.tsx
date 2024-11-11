@@ -38,7 +38,7 @@ export default function Page() {
         </div>
         <TabsContent value="manageClients">
           <Card x-chunk="dashboard-05-chunk-3">
-            <div className="hidden space-y-2 p-6 pb-16 md:block">
+            <div className="hidden space-y-2 p-6 pb-8 md:block">
               <div className="space-y-0.5">
                 <h2 className="text-xl font-semibold tracking-tight">
                   Manage Clients
@@ -56,7 +56,7 @@ export default function Page() {
         </TabsContent>
         <TabsContent value="addNewClient">
           <Card x-chunk="dashboard-05-chunk-3">
-            <div className="hidden space-y-2 p-6 pb-16 md:block">
+            <div className="hidden space-y-2 p-6 pb-8 md:block">
               <div className="space-y-0.5">
                 <h2 className="text-xl font-semibold tracking-tight">
                   Add New Client

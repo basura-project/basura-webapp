@@ -3,14 +3,15 @@ import { useToast } from "@/components/ui/use-toast";
 import { sha256 } from "js-sha256"; // You can use any hash library to generate a simple hash
 
 export function usePreloader(fetchData: () => Promise<any>, name: string) {
+
   const [data, setData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isDataLoading, setIsDataLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
     (async () => {
-      setIsLoading(true);
+      setIsDataLoading(true);
       try {
         const result = await fetchData();
         setData(result || null);
@@ -30,10 +31,10 @@ export function usePreloader(fetchData: () => Promise<any>, name: string) {
         console.error("Fetch error:", error);
         setError(error.message || "Failed to load data.");
       } finally {
-        setIsLoading(false);
+        setIsDataLoading(false);
       }
     })();
   }, [fetchData, name, toast]);
 
-  return { data, isLoading, error, setData, setIsLoading };
+  return { data, isDataLoading, error, setData, setIsDataLoading };
 }

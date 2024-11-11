@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
-import { addEmployee } from "@/services/index";
+import { suggestID, addEmployee } from "@/services/index";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -32,6 +32,19 @@ export default function NewEmployeeForm({
   const [isError, setIsError] = React.useState<string>("");
   const { toast } = useToast();
   const router = useRouter();
+
+  React.useEffect(() => {
+     const fetchSuggestedId = async () => {
+      try {
+        const response = await suggestID('employee');
+        console.log(response)
+        form.setValue("employeeId", response.data.suggested_employee_id)
+      } catch (err) {
+        console.error(err);
+      }
+     };
+     fetchSuggestedId();
+  },[]);
 
   const formSchema = z
     .object({
@@ -87,7 +100,7 @@ export default function NewEmployeeForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      employeeId: "",
+      employeeId: "ID",
       firstName: "",
       middleName: "",
       lastName: "",

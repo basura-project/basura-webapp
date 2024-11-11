@@ -39,6 +39,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { usePreloader } from "@/lib/preloader/usePreloaderHook";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -48,37 +49,23 @@ export default function EmployeesList({
 }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [deleteModalOpen, setDeleteModalOpen] = React.useState<boolean>(false);
-  const [properties, setProperties] = React.useState([]);
+  const [selectedProperty, setselectedProperty] = React.useState<string>("");
   const { toast } = useToast();
   const router = useRouter();
+  const { data, isDataLoading, error, setData} = usePreloader(getProperties,"Properties");
 
-  React.useEffect(() => {
-    (async () => {
-      try {
-        let res = await getProperties();
-        if (res) {
-          // toast({
-          //   title: "Successful",
-          //   description: "Properties list has been fetched successfully",
-          // });
-          setProperties(res.data);
-        }
-      } catch (e: any) {
-        console.log(e);
-      }
-    })();
-  }, []);
 
-  function viewProperty(empId: string) {
-    router.push(`properties/view/${empId}`);
+  function viewProperty(propertyId: string) {
+    router.push(`properties/view/${propertyId}`);
   }
 
-  function editProperty(empId: string) {
-    router.push(`properties/edit/${empId}`);
+  function editProperty(propertyId: string) {
+    router.push(`properties/edit/${propertyId}`);
   }
 
-  function openDeleteModal() {
+  function openDeleteModal(propertyId: string) {
     setDeleteModalOpen(true);
+    setselectedProperty(propertyId);
   }
 
   function closeDeleteModal() {
@@ -90,6 +77,9 @@ export default function EmployeesList({
     try {
       let res: any = await deleteProperty(propertyId);
       if (res) {
+        setData((prevData: any) => 
+          prevData.filter((property: any) => property.property_id !== propertyId)
+        );
         toast({
           title: "Successful",
           description: `Property ${propertyId} has been deleted successfully`,
@@ -108,8 +98,15 @@ export default function EmployeesList({
     }
   }
 
+  if (error) {
+    return <div>Error fetching data: {error}</div>;
+  }
+
   return (
     <div className={cn("grid gap-2", className)} {...props}>
+       {isDataLoading ? (
+        <Icons.spinner className="mx-auto my-4 h-6 w-6 animate-spin" />
+      ) : (
       <Table>
         <TableHeader>
           <TableRow>
@@ -121,7 +118,7 @@ export default function EmployeesList({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {properties.map((row: any) => {
+          {data?.reverse().map((row: any) => {
             return (
               <TableRow key={row.property_id}>
                 <TableCell>{row.property_id}</TableCell>
@@ -152,7 +149,7 @@ export default function EmployeesList({
                           <span className="pl-2">Edit</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => openDeleteModal()}
+                          onClick={() => openDeleteModal(row.property_id)}
                           className="cursor-pointer"
                         >
                           <AlertDialogTrigger asChild>
@@ -188,7 +185,7 @@ export default function EmployeesList({
                         <AlertDialogAction
                           disabled={isLoading}
                           onClick={() => {
-                            deletePropertyById(row.property_id);
+                            deletePropertyById(selectedProperty);
                           }}
                         >
                           {isLoading ? (
@@ -207,6 +204,7 @@ export default function EmployeesList({
           })}
         </TableBody>
       </Table>
+      )}
     </div>
   );
 }

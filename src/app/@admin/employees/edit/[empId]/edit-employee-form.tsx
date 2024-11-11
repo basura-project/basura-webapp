@@ -49,9 +49,21 @@ export default function EditEmployee({ empDetails }: any) {
         .string()
         .min(1, { message: "Please enter email" })
         .email("This is not a valid email."),
+      secondaryEmail: z
+        .string()
+        .min(1, { message: "Please enter secondary email" })
+        .email("This is not a valid email."),
       bankAccountNo: z
         .string()
         .min(1, { message: "Please enter bank account number" })
+        .max(50),
+      routingNo: z
+        .string()
+        .min(1, { message: "Please enter routing number" })
+        .max(50),
+      swiftCode: z
+        .string()
+        .min(1, { message: "Please enter swift code" })
         .max(50),
       username: z.string().min(1, { message: "Please enter username" }).max(50),
       password: z.string().min(1, { message: "Please enter password" }).max(50),
@@ -74,7 +86,10 @@ export default function EditEmployee({ empDetails }: any) {
       lastName: empDetails.name.lastname,
       contact: empDetails.contact,
       email: empDetails.email,
+      secondaryEmail: empDetails.secondary_email,
       bankAccountNo: empDetails.bank_account_no,
+      routingNo: empDetails.routing_no,
+      swiftCode: empDetails.swift_code,
       username: empDetails.username,
     },
   });
@@ -249,6 +264,27 @@ export default function EditEmployee({ empDetails }: any) {
         />
         <FormField
           control={form.control}
+          name="secondaryEmail"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel htmlFor="SecondaryEmail">Secondary Email</FormLabel>
+              <FormControl>
+                <Input
+                  id="SecondaryEmail"
+                  placeholder="Secondary Email"
+                  type="email"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  disabled={isLoading}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="bankAccountNo"
           render={({ field }) => (
             <FormItem>
@@ -257,6 +293,48 @@ export default function EditEmployee({ empDetails }: any) {
                 <Input
                   id="bankAccountNo"
                   placeholder="Bank Account No"
+                  type="text"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  disabled={isLoading}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="routingNo"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel htmlFor="RoutingNo">Routing No</FormLabel>
+              <FormControl>
+                <Input
+                  id="RoutingNo"
+                  placeholder="Routing No"
+                  type="text"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  disabled={isLoading}
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="swiftCode"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel htmlFor="SwiftCode">Swift Code</FormLabel>
+              <FormControl>
+                <Input
+                  id="SwiftCode"
+                  placeholder="Swift Code "
                   type="text"
                   autoCapitalize="none"
                   autoCorrect="off"

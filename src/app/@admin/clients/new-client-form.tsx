@@ -28,7 +28,7 @@ import {
 import { MultiSelect } from "@/components/ui/multi-select";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
-import { addClient } from "@/services/index";
+import { suggestID, addClient } from "@/services/index";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -40,6 +40,18 @@ export default function NewClientForm({
   const [isError, setIsError] = React.useState<string>("");
   const { toast } = useToast();
   const router = useRouter();
+
+  React.useEffect(() => {
+    const fetchSuggestedId = async () => {
+     try {
+       const response = await suggestID('client');
+       form.setValue("clientID", response.data.suggested_client_id)
+     } catch (err) {
+       console.error(err);
+     }
+    };
+    fetchSuggestedId();
+ },[]);
 
   const formSchema = z
     .object({
