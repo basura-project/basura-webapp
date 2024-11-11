@@ -120,14 +120,14 @@ export default function GarbageAttributeList({
                     >
                       <Pencil className="h-4 w-4 text-muted-foreground hover:text-foreground" />
                     </Button>
-                    <Button
+                    {/* <Button
                       onClick={() => openModal("delete", attribute)}
                       size="icon"
                       variant="link"
                       className="h-7 w-7"
                     >
                       <Trash2 className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-                    </Button>
+                    </Button> */}
                   </CardHeader>
                   <CardContent className="flex flex-row items-center pt-2">
                     <div

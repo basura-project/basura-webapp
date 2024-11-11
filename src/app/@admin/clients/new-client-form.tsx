@@ -28,7 +28,7 @@ import {
 import { MultiSelect } from "@/components/ui/multi-select";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
-import { suggestID, addClient } from "@/services/index";
+import { suggestID, addClient, getUnAssignedProperties } from "@/services/index";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -38,6 +38,7 @@ export default function NewClientForm({
 }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isError, setIsError] = React.useState<string>("");
+  const [unAssignedProperties, setUnAssignedProperties] = React.useState<any[]>([""]);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -133,11 +134,26 @@ export default function NewClientForm({
     form.reset();
   }
 
-  const propertiesMockData = [
-    { value: "PROP12345", label: "PROP12345" },
-    { value: "PROP12346", label: "PROP12345" },
-    { value: "PROP12347", label: "PROP12347"}
-  ];
+  const handleOnOpen = async (state: boolean) => {
+    // fetch unassigned properties
+    if (state) {
+      try {
+        const properties = await getUnAssignedProperties();
+
+        // Convert each property string to an object
+        const formattedProperties = properties.map((property: string) => ({
+          label: property,
+          name: property,
+        }));
+        setUnAssignedProperties(formattedProperties);
+
+      } catch (err) {
+        console.error("Error fetching unassigned properties", err);
+      }
+      // fetchProperties();
+    }
+  };
+
 
   return (
     <div className={cn("grid gap-2", className)} {...props}>
@@ -250,7 +266,8 @@ export default function NewClientForm({
                   </SelectContent>
                 </Select> */}
                 <MultiSelect
-                  options={propertiesMockData}
+                  onOpen={(state)=> handleOnOpen(state)}
+                  options={unAssignedProperties}
                   onValueChange={(value) => field.onChange(value)}
                   placeholder="Select"
                   variant="inverted"

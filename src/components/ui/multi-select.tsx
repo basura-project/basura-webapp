@@ -12,6 +12,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { Icons } from "@/components/ui/icons";
 import { Badge } from "@/components/ui/badge";
 import {
   Popover,
@@ -80,6 +81,8 @@ interface MultiSelectProps
   /** The default selected values when the component mounts. */
   defaultValue?: string[];
 
+  onOpen?: (isOpen: boolean) => void;
+
   /**
    * Placeholder text to be displayed when no values are selected.
    * Optional, defaults to "Select options".
@@ -126,6 +129,7 @@ export const MultiSelect = React.forwardRef<
     {
       options,
       onValueChange,
+      onOpen,
       variant,
       defaultValue = [],
       placeholder = "Select options",
@@ -142,6 +146,7 @@ export const MultiSelect = React.forwardRef<
       React.useState<string[]>(defaultValue);
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
     const [isAnimating, setIsAnimating] = React.useState(false);
+    const [loading, setLoading] = React.useState(false);
 
     const handleInputKeyDown = (
       event: React.KeyboardEvent<HTMLInputElement>
@@ -170,7 +175,10 @@ export const MultiSelect = React.forwardRef<
     };
 
     const handleTogglePopover = () => {
+      setLoading(true);
       setIsPopoverOpen((prev) => !prev);
+      onOpen?.(!isPopoverOpen);
+      setLoading(false);
     };
 
     const clearExtraOptions = () => {
@@ -309,31 +317,37 @@ export const MultiSelect = React.forwardRef<
                   </div>
                   <span>(Select All)</span>
                 </CommandItem>
-                {options.map((option) => {
-                  const isSelected = selectedValues.includes(option.value);
-                  return (
-                    <CommandItem
-                      key={option.value}
-                      onSelect={() => toggleOption(option.value)}
-                      className="cursor-pointer"
-                    >
-                      <div
-                        className={cn(
-                          "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                          isSelected
-                            ? "bg-primary text-primary-foreground"
-                            : "opacity-50 [&_svg]:invisible"
-                        )}
-                      >
-                        <CheckIcon className="h-4 w-4" />
-                      </div>
-                      {option.icon && (
-                        <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />
-                      )}
-                      <span>{option.label}</span>
-                    </CommandItem>
-                  );
-                })}
+                {loading ? (
+                    <div className="flex justify-center my-4">
+                      <Icons.spinner className="h-6 w-6 animate-spin" />
+                    </div>
+                  ) : (
+                    options.map((option) => {
+                      const isSelected = selectedValues.includes(option.value);
+                      return (
+                        <CommandItem
+                          key={option.value}
+                          onSelect={() => toggleOption(option.value)}
+                          className="cursor-pointer"
+                        >
+                          <div
+                            className={cn(
+                              "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                              isSelected
+                                ? "bg-primary text-primary-foreground"
+                                : "opacity-50 [&_svg]:invisible"
+                            )}
+                          >
+                            <CheckIcon className="h-4 w-4" />
+                          </div>
+                          {option.icon && (
+                            <option.icon className="mr-2 h-4 w-4 text-muted-foreground" />
+                          )}
+                          <span>{option.label}</span>
+                        </CommandItem>
+                      );
+                    })
+                  )}
               </CommandGroup>
               <CommandSeparator />
               <CommandGroup>
