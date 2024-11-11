@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
-import { addEmployee } from "@/services/index";
+import { suggestID, addEmployee } from "@/services/index";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -32,6 +32,19 @@ export default function NewEmployeeForm({
   const [isError, setIsError] = React.useState<string>("");
   const { toast } = useToast();
   const router = useRouter();
+
+  React.useEffect(() => {
+     const fetchSuggestedId = async () => {
+      try {
+        const response = await suggestID('employee');
+        console.log(response)
+        form.setValue("employeeId", response.data.suggested_employee_id)
+      } catch (err) {
+        console.error(err);
+      }
+     };
+     fetchSuggestedId();
+  },[]);
 
   const formSchema = z
     .object({
@@ -56,10 +69,22 @@ export default function NewEmployeeForm({
         .string()
         .min(1, { message: "Please enter email" })
         .email("This is not a valid email."),
+      secondaryEmail: z
+      .string()
+      .min(1, { message: "Please enter secondary email" })
+      .email("This is not a valid email."),
       bankAccountNo: z
         .string()
         .min(1, { message: "Please enter bank account number" })
         .max(50),
+      routingNo: z
+        .string()
+        .min(1, { message: "Please enter routing number" })
+        .max(9),
+      swiftCode: z
+        .string()
+        .min(1, { message: "Please enter swift code" })
+        .max(6),
       username: z.string().min(1, { message: "Please enter username" }).max(50),
       password: z.string().min(1, { message: "Please enter password" }).max(50),
       confirmPassword: z
@@ -75,13 +100,16 @@ export default function NewEmployeeForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      employeeId: "",
+      employeeId: "ID",
       firstName: "",
       middleName: "",
       lastName: "",
       contact: "",
       email: "",
+      secondaryEmail: "",
       bankAccountNo: "",
+      routingNo: "",
+      swiftCode: "",
       username: "",
       password: "",
       confirmPassword: "",
@@ -100,7 +128,10 @@ export default function NewEmployeeForm({
         lastname: values.lastName,
         contact: values.contact,
         email: values.email,
+        secondary_email: values.secondaryEmail,
         bank_account_no: values.bankAccountNo,
+        routing_no: values.routingNo,
+        swift_code: values.swiftCode,
         username: values.username,
         password: values.password,
         role: "employee",
@@ -118,7 +149,7 @@ export default function NewEmployeeForm({
       if (e.response && e.response.data) {
         setIsError(e.response.data.error);
       }
-      console.log(e);
+      console.log(e.response.data);
     }
   }
 
@@ -259,6 +290,27 @@ export default function NewEmployeeForm({
           />
           <FormField
             control={form.control}
+            name="secondaryEmail"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Secondary Email</FormLabel>
+                <FormControl>
+                  <Input
+                    id="secondaryEmail"
+                    placeholder="Secondary Email"
+                    type="email"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    disabled={isLoading}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
             name="bankAccountNo"
             render={({ field }) => (
               <FormItem>
@@ -267,6 +319,48 @@ export default function NewEmployeeForm({
                   <Input
                     id="bankAccountNo"
                     placeholder="Bank Account No"
+                    type="text"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    disabled={isLoading}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="routingNo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Routing Number</FormLabel>
+                <FormControl>
+                  <Input
+                    id="routingNo"
+                    placeholder="Routing Number"
+                    type="text"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    disabled={isLoading}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="swiftCode"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Swift Code</FormLabel>
+                <FormControl>
+                  <Input
+                    id="swiftCode"
+                    placeholder="Swift Code"
                     type="text"
                     autoCapitalize="none"
                     autoCorrect="off"

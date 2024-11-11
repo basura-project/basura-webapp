@@ -5,6 +5,8 @@ import { Icons } from "@/components/ui/icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
+import { MultiSelect } from "@/components/ui/multi-select";
+
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,29 +21,24 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import { editEmployee } from "@/services/index";
+import { editClient } from "@/services/index";
 
-export default function EditEmployee({ empDetails }: any) {
+export default function EditClient({ clientDetails }: any) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isError, setIsError] = React.useState<string>("");
 
   const formSchema = z
     .object({
-      employeeId: z
+      clientID: z
         .string()
-        .min(1, { message: "Please enter Employee Id" })
+        .min(1, { message: "Please enter Client Id" })
         .max(50),
-      firstName: z
+      name: z
         .string()
-        .min(1, { message: "Please enter first name" })
+        .min(1, { message: "Please enter Name" })
         .max(50),
-      middleName: z.string(),
-      lastName: z
-        .string()
-        .min(1, { message: "Please enter last name" })
-        .max(50),
-      contact: z
+      phone: z
         .string()
         .min(1, { message: "Please enter contact number" })
         .max(50),
@@ -49,10 +46,7 @@ export default function EditEmployee({ empDetails }: any) {
         .string()
         .min(1, { message: "Please enter email" })
         .email("This is not a valid email."),
-      bankAccountNo: z
-        .string()
-        .min(1, { message: "Please enter bank account number" })
-        .max(50),
+      properties: z.array(z.string()).min(1, { message: "Please select a property" }).default([]),
       username: z.string().min(1, { message: "Please enter username" }).max(50),
       password: z.string().min(1, { message: "Please enter password" }).max(50),
       confirmPassword: z
@@ -68,14 +62,13 @@ export default function EditEmployee({ empDetails }: any) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      employeeId: empDetails.employee_id,
-      firstName: empDetails.name.firstname,
-      middleName: empDetails.name.middlename,
-      lastName: empDetails.name.lastname,
-      contact: empDetails.contact,
-      email: empDetails.email,
-      bankAccountNo: empDetails.bank_account_no,
-      username: empDetails.username,
+      clientID: clientDetails.client_id,
+      name: clientDetails.client_name,
+      phone: clientDetails.phone,
+      email: clientDetails.email,
+      username: clientDetails.username,
+      password: "",
+      properties: []
     },
   });
 
@@ -85,22 +78,20 @@ export default function EditEmployee({ empDetails }: any) {
     setIsError("");
 
     try {
-      let employeeDetails = {
-        name: {
-          firstname: values.firstName,
-          middlename: values.middleName,
-          lastname: values.lastName,
-        },
-        contact: values.contact,
+      let clientDetailsForm = {
+        client_id: clientDetails.client_id,
+        client_name: values.name,
+        phone: values.phone,
         email: values.email,
-        bank_account_no: values.bankAccountNo,
-        role: "employee",
+        username: values.username,
+        password: values.password,
+        properties: values.properties
       };
-      let res = await editEmployee(empDetails.employee_id, employeeDetails);
+      let res = await editClient(clientDetails.client_id, clientDetailsForm);
       if (res) {
         toast({
           title: "Successful",
-          description: "Employee details submitted successfully",
+          description: "Client details submitted successfully",
         });
       }
       setIsLoading(false);
@@ -117,62 +108,47 @@ export default function EditEmployee({ empDetails }: any) {
     form.reset();
   }
 
+  const propertiesMockData = [
+    { value: "PROP12345", label: "PROP12345" },
+    { value: "PROP12346", label: "PROP12346" },
+    { value: "PROP12347", label: "PROP12347"}
+  ];
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+      <FormField
+            control={form.control}
+            name="clientID"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Client Id</FormLabel>
+                <FormControl>
+                  <Input
+                    id="clientID"
+                    placeholder="Client Id"
+                    type="text"
+                    autoCapitalize="none"
+                    autoComplete="clientID"
+                    autoCorrect="off"
+                    disabled={true}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         <FormField
           control={form.control}
-          name="employeeId"
+          name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Employee Id</FormLabel>
+              <FormLabel>Client Name</FormLabel>
               <FormControl>
                 <Input
-                  id="employeeId"
-                  placeholder="Employee Id"
-                  type="text"
-                  autoCapitalize="none"
-                  autoComplete="employeeId"
-                  autoCorrect="off"
-                  disabled={true}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="firstName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>First Name</FormLabel>
-              <FormControl>
-                <Input
-                  id="firstName"
-                  placeholder="First Name"
-                  type="text"
-                  autoCapitalize="none"
-                  autoCorrect="off"
-                  disabled={isLoading}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="middleName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Middle Name</FormLabel>
-              <FormControl>
-                <Input
-                  id="middleName"
-                  placeholder="Middle Name"
+                  id="Name"
+                  placeholder="Name"
                   type="text"
                   autoCapitalize="none"
                   autoCorrect="off"
@@ -186,35 +162,14 @@ export default function EditEmployee({ empDetails }: any) {
         />
         <FormField
           control={form.control}
-          name="lastName"
+          name="phone"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Last Name</FormLabel>
+              <FormLabel>Client Phone No</FormLabel>
               <FormControl>
                 <Input
-                  id="lastName"
-                  placeholder="Last Name"
-                  type="text"
-                  autoCapitalize="none"
-                  autoCorrect="off"
-                  disabled={isLoading}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="contact"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Contact</FormLabel>
-              <FormControl>
-                <Input
-                  id="contact"
-                  placeholder="Contact"
+                  id="phone"
+                  placeholder="+1 XXXXXXXXX"
                   type="text"
                   autoCapitalize="none"
                   autoCorrect="off"
@@ -231,7 +186,7 @@ export default function EditEmployee({ empDetails }: any) {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>Email Id</FormLabel>
               <FormControl>
                 <Input
                   id="email"
@@ -249,20 +204,19 @@ export default function EditEmployee({ empDetails }: any) {
         />
         <FormField
           control={form.control}
-          name="bankAccountNo"
+          name="properties"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Bank Account No</FormLabel>
+              <FormLabel>Properties</FormLabel>
               <FormControl>
-                <Input
-                  id="bankAccountNo"
-                  placeholder="Bank Account No"
-                  type="text"
-                  autoCapitalize="none"
-                  autoCorrect="off"
-                  disabled={isLoading}
-                  {...field}
-                />
+                <MultiSelect
+                    options={propertiesMockData}
+                    defaultValue={clientDetails.properties}
+                    onValueChange={(value) => field.onChange(value)}
+                    placeholder="Select"
+                    variant="inverted"
+                    animation={2}
+                  />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -289,6 +243,27 @@ export default function EditEmployee({ empDetails }: any) {
             </FormItem>
           )}
         />
+        <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input
+                    id="password"
+                    placeholder="Password"
+                    type="password"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    disabled={true}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         <Button
           onClick={() => clearForm()}
           variant="outline"

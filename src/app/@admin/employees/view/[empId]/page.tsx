@@ -98,12 +98,24 @@ export default function ViewEmployee({ params: { empId } }: any) {
                 <p className="font-normal">{empDetails.email}</p>
               </div>
               <div className="mb-3">
-                <p className="font-medium">Bank Account No</p>
-                <p className="font-normal">{empDetails.bank_account_no}</p>
+                <p className="font-medium">Secondary Email</p>
+                <p className="font-normal">{empDetails.secondary_email}</p>
               </div>
               <div className="mb-3">
                 <p className="font-medium">User Name</p>
                 <p className="font-normal">{empDetails.username}</p>
+              </div>
+              <div className="mb-3">
+                <p className="font-medium">Bank Account No</p>
+                <p className="font-normal">{empDetails.bank_account_no}</p>
+              </div>
+              <div className="mb-3">
+                <p className="font-medium">Routing No</p>
+                <p className="font-normal">{empDetails.routing_no}</p>
+              </div>
+              <div className="mb-3">
+                <p className="font-medium">Swift Code </p>
+                <p className="font-normal">{empDetails.swift_code}</p>
               </div>
               <div className="mb-3">
                 <p className="font-medium">Role</p>

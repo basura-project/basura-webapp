@@ -21,13 +21,26 @@ import {
 } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/components/ui/use-toast";
-import { addProperty } from "@/services/index";
+import { suggestID, addProperty } from "@/services/index";
 
 export default function CommercialPropertyForm({ className, ...props }: any) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isError, setIsError] = React.useState<string>("");
   const { toast } = useToast();
+
+  React.useEffect(() => {
+    const fetchSuggestedId = async () => {
+     try {
+       const response = await suggestID('property');
+       form.setValue("propertyId", response.data.suggested_property_id)
+     } catch (err) {
+       console.error(err);
+     }
+    };
+    fetchSuggestedId();
+ },[]);
 
   const formSchema = z.object({
     propertyId: z
@@ -74,6 +87,7 @@ export default function CommercialPropertyForm({ className, ...props }: any) {
     chuteFloorLevel: z.coerce.number({
       message: "Please enter floor level",
     }),
+    chuteFloorAll: z.coerce.boolean().optional(),
     noOfFloors: z.coerce.number({
       message: "Please enter the no. of floors",
     }),
@@ -139,6 +153,7 @@ export default function CommercialPropertyForm({ className, ...props }: any) {
         industry_type: values.industryType,
         chute_present: values.chutePresent == "Yes" ? true : false,
         chute_floor_level: values.chuteFloorLevel,
+        chuteFloorAll: values.chuteFloorAll,
         number_of_floors: values.noOfFloors,
         number_of_basement_floors: values.noOfBasementFloors,
         number_of_units_per_floor: values.noOfUnitsPerFloor,
@@ -295,6 +310,25 @@ export default function CommercialPropertyForm({ className, ...props }: any) {
               </FormItem>
             )}
           />
+          <FormField
+          control={form.control}
+          name="chuteFloorAll"
+          render={({ field }) => (
+            <FormItem className="flex space-x-3 space-y-0 mt-3">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>
+                  Chute present on all floors
+                </FormLabel>
+              </div>
+            </FormItem>
+          )}
+        />
         </div>
       </>
     ) : (

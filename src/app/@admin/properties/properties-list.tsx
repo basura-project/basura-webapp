@@ -39,6 +39,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { usePreloader } from "@/lib/preloader/usePreloaderHook";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -48,230 +49,23 @@ export default function EmployeesList({
 }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [deleteModalOpen, setDeleteModalOpen] = React.useState<boolean>(false);
+  const [selectedProperty, setselectedProperty] = React.useState<string>("");
   const { toast } = useToast();
   const router = useRouter();
+  const { data, isDataLoading, error, setData} = usePreloader(getProperties,"Properties");
 
-  let propertiesData: any = [
-    {
-      property_id: "PROP12340",
-      property_type: "Resident Buildings",
-      property_manager_name: "Manager Name",
-      property_manager_phone_no: "+1234567890",
-      email: "manager@example.com",
-      owner_name: "Owner Name",
-      owner_number: "+1234567890",
-      apartment_type: "2BHK",
-      housing_type: "Public",
-      borough_name: "Brooklyn",
-      street_name: "Main Street",
-      building_number: "123",
-      chute_present: true,
-      number_of_floors: 5,
-      number_of_basement_floors: 1,
-      number_of_units_per_floor: 4,
-      number_of_units_total: 20,
-      franchise_name: "McDonald's",
-      inside_a_mall: false,
-      mall_name: "Mall Name",
-      is_event: false,
-      event_name: "Event Name",
-      retail_or_office: true,
-      industry_type: "Food",
-      handling: "Federal",
-      department: "Health",
-      is_bid: true,
-      area_covered: "Main Street",
-      building_type: "School",
-      school: "Elementary",
-    },
-    {
-      property_id: "PROP12341",
-      property_type: "Resident Buildings",
-      property_manager_name: "Manager Name",
-      property_manager_phone_no: "+1234567890",
-      email: "manager@example.com",
-      owner_name: "Owner Name",
-      owner_number: "+1234567890",
-      apartment_type: "2BHK",
-      housing_type: "Public",
-      borough_name: "Brooklyn",
-      street_name: "Main Street",
-      building_number: "123",
-      chute_present: true,
-      number_of_floors: 5,
-      number_of_basement_floors: 1,
-      number_of_units_per_floor: 4,
-      number_of_units_total: 20,
-      franchise_name: "McDonald's",
-      inside_a_mall: false,
-      mall_name: "Mall Name",
-      is_event: false,
-      event_name: "Event Name",
-      retail_or_office: true,
-      industry_type: "Food",
-      handling: "Federal",
-      department: "Health",
-      is_bid: true,
-      area_covered: "Main Street",
-      building_type: "School",
-      school: "Elementary",
-    },
-    {
-      property_id: "PROP12342",
-      property_type: "Resident Buildings",
-      property_manager_name: "Manager Name",
-      property_manager_phone_no: "+1234567890",
-      email: "manager@example.com",
-      owner_name: "Owner Name",
-      owner_number: "+1234567890",
-      apartment_type: "2BHK",
-      housing_type: "Public",
-      borough_name: "Brooklyn",
-      street_name: "Main Street",
-      building_number: "123",
-      chute_present: true,
-      number_of_floors: 5,
-      number_of_basement_floors: 1,
-      number_of_units_per_floor: 4,
-      number_of_units_total: 20,
-      franchise_name: "McDonald's",
-      inside_a_mall: false,
-      mall_name: "Mall Name",
-      is_event: false,
-      event_name: "Event Name",
-      retail_or_office: true,
-      industry_type: "Food",
-      handling: "Federal",
-      department: "Health",
-      is_bid: true,
-      area_covered: "Main Street",
-      building_type: "School",
-      school: "Elementary",
-    },
-    {
-      property_id: "PROP12343",
-      property_type: "Resident Buildings",
-      property_manager_name: "Manager Name",
-      property_manager_phone_no: "+1234567890",
-      email: "manager@example.com",
-      owner_name: "Owner Name",
-      owner_number: "+1234567890",
-      apartment_type: "2BHK",
-      housing_type: "Public",
-      borough_name: "Brooklyn",
-      street_name: "Main Street",
-      building_number: "123",
-      chute_present: true,
-      number_of_floors: 5,
-      number_of_basement_floors: 1,
-      number_of_units_per_floor: 4,
-      number_of_units_total: 20,
-      franchise_name: "McDonald's",
-      inside_a_mall: false,
-      mall_name: "Mall Name",
-      is_event: false,
-      event_name: "Event Name",
-      retail_or_office: true,
-      industry_type: "Food",
-      handling: "Federal",
-      department: "Health",
-      is_bid: true,
-      area_covered: "Main Street",
-      building_type: "School",
-      school: "Elementary",
-    },
-    {
-      property_id: "PROP12344",
-      property_type: "Resident Buildings",
-      property_manager_name: "Manager Name",
-      property_manager_phone_no: "+1234567890",
-      email: "manager@example.com",
-      owner_name: "Owner Name",
-      owner_number: "+1234567890",
-      apartment_type: "2BHK",
-      housing_type: "Public",
-      borough_name: "Brooklyn",
-      street_name: "Main Street",
-      building_number: "123",
-      chute_present: true,
-      number_of_floors: 5,
-      number_of_basement_floors: 1,
-      number_of_units_per_floor: 4,
-      number_of_units_total: 20,
-      franchise_name: "McDonald's",
-      inside_a_mall: false,
-      mall_name: "Mall Name",
-      is_event: false,
-      event_name: "Event Name",
-      retail_or_office: true,
-      industry_type: "Food",
-      handling: "Federal",
-      department: "Health",
-      is_bid: true,
-      area_covered: "Main Street",
-      building_type: "School",
-      school: "Elementary",
-    },
-    {
-      property_id: "PROP12345",
-      property_type: "Resident Buildings",
-      property_manager_name: "Manager Name",
-      property_manager_phone_no: "+1234567890",
-      email: "manager@example.com",
-      owner_name: "Owner Name",
-      owner_number: "+1234567890",
-      apartment_type: "2BHK",
-      housing_type: "Public",
-      borough_name: "Brooklyn",
-      street_name: "Main Street",
-      building_number: "123",
-      chute_present: true,
-      number_of_floors: 5,
-      number_of_basement_floors: 1,
-      number_of_units_per_floor: 4,
-      number_of_units_total: 20,
-      franchise_name: "McDonald's",
-      inside_a_mall: false,
-      mall_name: "Mall Name",
-      is_event: false,
-      event_name: "Event Name",
-      retail_or_office: true,
-      industry_type: "Food",
-      handling: "Federal",
-      department: "Health",
-      is_bid: true,
-      area_covered: "Main Street",
-      building_type: "School",
-      school: "Elementary",
-    },
-  ];
 
-  React.useEffect(() => {
-    (async () => {
-      try {
-        let res = await getProperties();
-        if (res) {
-          // toast({
-          //   title: "Successful",
-          //   description: "Properties list has been fetched successfully",
-          // });
-        }
-      } catch (e: any) {
-        console.log(e);
-      }
-    })();
-  }, []);
-
-  function viewProperty(empId: string) {
-    router.push(`properties/view/${empId}`);
+  function viewProperty(propertyId: string) {
+    router.push(`properties/view/${propertyId}`);
   }
 
-  function editProperty(empId: string) {
-    router.push(`properties/edit/${empId}`);
+  function editProperty(propertyId: string) {
+    router.push(`properties/edit/${propertyId}`);
   }
 
-  function openDeleteModal() {
+  function openDeleteModal(propertyId: string) {
     setDeleteModalOpen(true);
+    setselectedProperty(propertyId);
   }
 
   function closeDeleteModal() {
@@ -283,6 +77,9 @@ export default function EmployeesList({
     try {
       let res: any = await deleteProperty(propertyId);
       if (res) {
+        setData((prevData: any) => 
+          prevData.filter((property: any) => property.property_id !== propertyId)
+        );
         toast({
           title: "Successful",
           description: `Property ${propertyId} has been deleted successfully`,
@@ -301,8 +98,15 @@ export default function EmployeesList({
     }
   }
 
+  if (error) {
+    return <div>Error fetching data: {error}</div>;
+  }
+
   return (
     <div className={cn("grid gap-2", className)} {...props}>
+       {isDataLoading ? (
+        <Icons.spinner className="mx-auto my-4 h-6 w-6 animate-spin" />
+      ) : (
       <Table>
         <TableHeader>
           <TableRow>
@@ -314,7 +118,7 @@ export default function EmployeesList({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {propertiesData.map((row: any) => {
+          {data?.reverse().map((row: any) => {
             return (
               <TableRow key={row.property_id}>
                 <TableCell>{row.property_id}</TableCell>
@@ -332,20 +136,20 @@ export default function EmployeesList({
                       <DropdownMenuContent className="w-16">
                         <DropdownMenuItem
                           className="cursor-pointer"
-                          onClick={() => viewProperty("BS12")}
+                          onClick={() => viewProperty(row.property_id)}
                         >
                           <View size={16} />
                           <span className="pl-2">View</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="cursor-pointer"
-                          onClick={() => editProperty("BS12")}
+                          onClick={() => editProperty(row.property_id)}
                         >
                           <PencilLine size={16} />
                           <span className="pl-2">Edit</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => openDeleteModal()}
+                          onClick={() => openDeleteModal(row.property_id)}
                           className="cursor-pointer"
                         >
                           <AlertDialogTrigger asChild>
@@ -381,7 +185,7 @@ export default function EmployeesList({
                         <AlertDialogAction
                           disabled={isLoading}
                           onClick={() => {
-                            deletePropertyById("BS12");
+                            deletePropertyById(selectedProperty);
                           }}
                         >
                           {isLoading ? (
@@ -400,6 +204,7 @@ export default function EmployeesList({
           })}
         </TableBody>
       </Table>
+      )}
     </div>
   );
 }

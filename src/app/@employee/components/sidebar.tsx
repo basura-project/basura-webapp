@@ -8,6 +8,8 @@ import {
   FilePlus,
   Building,
   Settings,
+  SquarePen,
+  Package,
   Users2,
 } from "lucide-react";
 
@@ -43,75 +45,39 @@ export default function Sidebar() {
           <Tooltip>
             <TooltipTrigger asChild>
               <Link
-                href="/employees"
+                href="/new-entry"
                 className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:text-foreground md:h-8 md:w-8 ${
-                  pathname == "/employees"
+                  pathname == "/new-entry" || pathname == "/"
                     ? "bg-accent text-accent-foreground"
                     : "text-muted-foreground"
                 }`}
               >
-                <Users2 className="h-5 w-5" />
-                <span className="sr-only">Employees</span>
+                <SquarePen className="h-5 w-5" />
+                <span className="sr-only">New Entry</span>
               </Link>
             </TooltipTrigger>
-            <TooltipContent side="right">Employees</TooltipContent>
+            <TooltipContent side="right">New Entry</TooltipContent>
           </Tooltip>
         </TooltipProvider>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <Link
-                href="/properties"
+                href="/submissions"
                 className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:text-foreground md:h-8 md:w-8 ${
-                  pathname == "/properties"
+                  pathname == "/submissions"
                     ? "bg-accent text-accent-foreground"
                     : "text-muted-foreground"
                 }`}
               >
-                <Building className="h-5 w-5" />
-                <span className="sr-only">Properties</span>
+                <Package className="h-5 w-5" />
+                <span className="sr-only">Submissions</span>
               </Link>
             </TooltipTrigger>
-            <TooltipContent side="right">Properties</TooltipContent>
+            <TooltipContent side="right">Submissions</TooltipContent>
           </Tooltip>
         </TooltipProvider>
         <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href="/clients"
-                className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:text-foreground md:h-8 md:w-8 ${
-                  pathname == "/clients"
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground"
-                }`}
-              >
-                <SquareUserRound className="h-5 w-5" />
-                <span className="sr-only">Clients</span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">Clients</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href="/garbage-attributes"
-                className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:text-foreground md:h-8 md:w-8 ${
-                  pathname == "/garbage-attributes"
-                    ? "bg-accent text-accent-foreground"
-                    : "text-muted-foreground"
-                }`}
-              >
-                <FilePlus className="h-5 w-5" />
-                <span className="sr-only">Garbage Attributes</span>
-              </Link>
-            </TooltipTrigger>
-            <TooltipContent side="right">Garbage Attributes</TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-        {/* <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
               <Link
@@ -128,7 +94,7 @@ export default function Sidebar() {
             </TooltipTrigger>
             <TooltipContent side="right">Analytics</TooltipContent>
           </Tooltip>
-        </TooltipProvider> */}
+        </TooltipProvider>
       </nav>
       <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-4">
         <TooltipProvider>

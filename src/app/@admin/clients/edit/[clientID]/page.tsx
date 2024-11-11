@@ -3,12 +3,12 @@
 import * as React from "react";
 import Link from "next/link";
 
-import { getEmployeeDetails } from "@/services/index";
+import { getClientDetails } from "@/services/index";
 
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
-import EditEmployeeForm from "./edit-employee-form";
+import EditClientForm from "./edit-client-form";
 
 import {
   Breadcrumb,
@@ -19,17 +19,17 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-export default function EditEmployee({ params: { empId } }: any) {
+export default function EditClient({ params: { clientID } }: any) {
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [isError, setIsError] = React.useState<string>("");
-  const [empDetails, setEmpDetails] = React.useState<any>({});
+  const [clientDetails, setClientDetails] = React.useState<any>({});
 
   React.useEffect(() => {
     (async () => {
       try {
-        let res = await getEmployeeDetails(empId);
+        let res = await getClientDetails(clientID);
         if (res.data) {
-          setEmpDetails(res.data);
+          setClientDetails(res.data);
         }
         setIsLoading(false);
         setIsError("");
@@ -50,11 +50,11 @@ export default function EditEmployee({ params: { empId } }: any) {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href="/employees">Employees</BreadcrumbLink>
+            <BreadcrumbLink href="/clients">Clients</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>Edit #{empId}</BreadcrumbPage>
+            <BreadcrumbPage>Edit #{clientID}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -63,7 +63,7 @@ export default function EditEmployee({ params: { empId } }: any) {
         <div className="hidden space-y-2 p-6 pb-6 md:block">
           <div className="space-y-0.5">
             <h2 className="text-xl font-semibold tracking-tight">
-              Edit Employee
+              Edit Client
             </h2>
           </div>
           <Separator className="my-6" />
@@ -72,7 +72,7 @@ export default function EditEmployee({ params: { empId } }: any) {
           )}
           {!isLoading && isError == "" && (
             <div className="grid gap-2 lg:max-w-sm">
-              <EditEmployeeForm empDetails={empDetails} />
+              <EditClientForm clientDetails={clientDetails} />
             </div>
           )}
         </div>

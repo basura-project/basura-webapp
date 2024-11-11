@@ -91,6 +91,13 @@ export const login = async (userDetails: any) => {
   }
 };
 
+// Logout function
+export const logout = () => {
+  Cookies.remove("access_token");
+  Cookies.remove("refresh_token");
+  window.location.href = "/";
+};
+
 // User details
 export const userDetails = async () => {
   try {
@@ -101,6 +108,19 @@ export const userDetails = async () => {
     throw error;
   }
 };
+
+// Suggest employee ID
+
+export const suggestID = async (type: string) => {
+  try {
+    const response = await apiService.get(`${type}-id/suggest`);
+    return response;
+  } catch (error) {
+    console.error(`Error fetching suggested ${type} ID`, error);
+    throw error;
+  }
+};
+
 
 // Add new employee
 export const addEmployee = async (employeeDetails: any) => {
@@ -148,8 +168,8 @@ export const deleteEmployee = async (employee_id: string) => {
 // Get list of employees
 export const getEmployees = async () => {
   try {
-    const response = await apiService.get("employees");
-    return response;
+    const response = await apiService.get("employees", { params: { sort_by: 'employee_id', sort_order: 'desc' }});
+    return response.data;
   } catch (error) {
     console.error("Error fetching employees list", error);
     throw error;
@@ -181,8 +201,8 @@ export const addProperty = async (propertyDetails: any) => {
 // Get list of properties
 export const getProperties = async () => {
   try {
-    const response = await apiService.get("properties");
-    return response;
+    const response = await apiService.get("properties", { params: { sort_by: 'property_id', sort_order: 'asc' }});
+    return response.data;
   } catch (error) {
     console.error("Error fetching properties list", error);
     throw error;
@@ -224,6 +244,146 @@ export const deleteProperty = async (propertyId: string) => {
     return response;
   } catch (error) {
     console.error("Error deleting property", error);
+    throw error;
+  }
+};
+
+//Get Clients
+export const getClients = async () => {
+  try {
+    const response = await apiService.get("clients", { params: { sort_by: 'client_id', sort_order: 'asc' }});
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching clients list", error);
+    throw error;
+  }
+};
+
+// Get employee details
+export const getClientDetails = async (clientID: string) => {
+  try {
+    const response = await apiService.get(`client/${clientID}`);
+    console.log(response);
+    return response;
+  } catch (error) {
+    console.error("Error fetching employee details", error);
+    throw error;
+  }
+};
+
+// Add new Client
+export const addClient = async (clientDetails: any) => {
+  try {
+    const response = await apiService.post("add-client", clientDetails, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("Error adding a new employee", error);
+    throw error;
+  }
+};
+
+// Edit Client
+export const editClient = async (
+  client_id: string,
+  clientDetails: any
+) => {
+  try {
+    const response = await apiService.put(
+      `client/${client_id}`,
+      clientDetails
+    );
+    return response;
+  } catch (error) {
+    console.error("Error updating employee details", error);
+    throw error;
+  }
+};
+
+// Delete Client
+export const deleteClient = async (client_id: string) => {
+  try {
+    const response = await apiService.delete(`client/${client_id}`);
+    return response;
+  } catch (error) {
+    console.error("Error deleting employee", error);
+    throw error;
+  }
+};
+
+
+//Get Garbage attributes
+export const getGarbageAttributes = async () => {
+  try {
+    const response = await apiService.get("garbage-attributes");
+    return response?.status === 200 ? response.data : null;
+  } catch (error) {
+    console.error("Error fetching garbage attributes", error);
+    throw new Error("Failed to fetch garbage attributes");
+  }
+};
+
+
+// Add a garbage attribute
+export const addGarbageAttribute = async (garbageAttribute: any) => {
+  try {
+    const response = await apiService.post("garbage-attributes", garbageAttribute, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("Error adding a garbage attribute", error);
+    throw error;
+  }
+};
+
+// Edit a garbage attribute
+
+export const editGarbageAttribute = async (
+  garbageAttribute_name: string,
+  garbageAttribute: object
+) => {
+  try {
+    const response = await apiService.put(
+      `garbage-attributes/${garbageAttribute_name}`,
+      garbageAttribute
+    );
+    return response;
+  } catch (error) {
+    console.error("Error updating garbage attribute", error);
+    throw error;
+  }
+};
+
+// Delete a garbage attribute
+
+export const deleteGarbageAttribute = async (garbageAttribute_name: string) => {
+  try {
+    const response = await apiService.delete(`garbage-attributes/${garbageAttribute_name}`);
+    return response;
+  } catch (error) {
+    console.error("Error deleting garbage attribute", error);
+    throw error;
+  }
+};
+
+// Add a garbage entry
+
+export const addGarbageEntry = async (garbage_entry: any) => {
+  try {
+    const response = await apiService.post("add-entry", garbage_entry, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("Error adding a garbage entry", error);
     throw error;
   }
 };

@@ -32,26 +32,16 @@ export default function Loading({ className, variant, ...props }: any) {
       <Image
         src="/logo-icon.svg"
         width={42}
-        height={42}
-        alt="Basura Logo"
-        className="block dark:hidden"
-        style={
-          !loaded
-            ? {
-                position: "absolute",
-                left: "calc(50% - 21px)",
-                top: "calc(50% - 21px)",
-                transition: "0.2s",
-              }
-            : {
-                position: "absolute",
-                left: "11.5px",
-                top: "16px",
-                width: "32px",
-                transition: "0.2s",
-              }
-        }
-      />
-    </div>
-  );
-}
+          height={42}
+          alt="Basura Logo"
+          className="block dark:hidden"
+          style={{
+            position: "absolute",
+            left: "calc(50% - 21px)",
+            top: "calc(50% - 21px)",
+            transition: "0.2s",
+          }}
+        />
+      </div>
+    );
+  }

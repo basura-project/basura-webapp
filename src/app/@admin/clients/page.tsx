@@ -1,5 +1,5 @@
-import NewEmployeeForm from "./new-employee-form";
-import EmployeesList from "./employees-list";
+import NewEmployeeForm from "./new-client-form";
+import ClientList from "./clients-list";
 
 import { Card } from "@/components/ui/card";
 
@@ -38,7 +38,7 @@ export default function Page() {
         </div>
         <TabsContent value="manageClients">
           <Card x-chunk="dashboard-05-chunk-3">
-            <div className="hidden space-y-2 p-6 pb-16 md:block">
+            <div className="hidden space-y-2 p-6 pb-8 md:block">
               <div className="space-y-0.5">
                 <h2 className="text-xl font-semibold tracking-tight">
                   Manage Clients
@@ -49,14 +49,14 @@ export default function Page() {
               </div>
               <Separator className="my-6" />
               <div className="flex-1 ">
-                <EmployeesList />
+                <ClientList />
               </div>
             </div>
           </Card>
         </TabsContent>
         <TabsContent value="addNewClient">
           <Card x-chunk="dashboard-05-chunk-3">
-            <div className="hidden space-y-2 p-6 pb-16 md:block">
+            <div className="hidden space-y-2 p-6 pb-8 md:block">
               <div className="space-y-0.5">
                 <h2 className="text-xl font-semibold tracking-tight">
                   Add New Client

@@ -39,6 +39,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { usePreloader } from "@/lib/preloader/usePreloaderHook";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -48,123 +49,11 @@ export default function EmployeesList({
 }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [deleteModalOpen, setDeleteModalOpen] = React.useState<boolean>(false);
+  const [selectedEmployee, setSelectedEmployee] = React.useState<string>("");
   const { toast } = useToast();
   const router = useRouter();
+  const { data, isDataLoading, error, setData} = usePreloader(getEmployees,"Employees");
 
-  let empData: any = [
-    {
-      employee_id: "EMP12345",
-      name: {
-        firstname: "John",
-        middlename: "M",
-        lastname: "Doe",
-      },
-      contact: "+1234567890",
-      email: "john.doe@example.com",
-      username: "john_doe",
-      bank_account_no: "1234567890123456",
-      password: "password123",
-      id_proof: "Base64 encoded file data",
-      profile_photo: "Base64 encoded file data",
-      role: "employee",
-    },
-    {
-      employee_id: "EMP12346",
-      name: {
-        firstname: "John",
-        middlename: "M",
-        lastname: "Doe",
-      },
-      contact: "+1234567890",
-      email: "john.doe@example.com",
-      username: "john_doe",
-      bank_account_no: "1234567890123456",
-      password: "password123",
-      id_proof: "Base64 encoded file data",
-      profile_photo: "Base64 encoded file data",
-      role: "employee",
-    },
-    {
-      employee_id: "EMP12347",
-      name: {
-        firstname: "John",
-        middlename: "M",
-        lastname: "Doe",
-      },
-      contact: "+1234567890",
-      email: "john.doe@example.com",
-      username: "john_doe",
-      bank_account_no: "1234567890123456",
-      password: "password123",
-      id_proof: "Base64 encoded file data",
-      profile_photo: "Base64 encoded file data",
-      role: "employee",
-    },
-    {
-      employee_id: "EMP12348",
-      name: {
-        firstname: "John",
-        middlename: "M",
-        lastname: "Doe",
-      },
-      contact: "+1234567890",
-      email: "john.doe@example.com",
-      username: "john_doe",
-      bank_account_no: "1234567890123456",
-      password: "password123",
-      id_proof: "Base64 encoded file data",
-      profile_photo: "Base64 encoded file data",
-      role: "employee",
-    },
-    {
-      employee_id: "EMP12349",
-      name: {
-        firstname: "John",
-        middlename: "M",
-        lastname: "Doe",
-      },
-      contact: "+1234567890",
-      email: "john.doe@example.com",
-      username: "john_doe",
-      bank_account_no: "1234567890123456",
-      password: "password123",
-      id_proof: "Base64 encoded file data",
-      profile_photo: "Base64 encoded file data",
-      role: "employee",
-    },
-    {
-      employee_id: "EMP12350",
-      name: {
-        firstname: "John",
-        middlename: "M",
-        lastname: "Doe",
-      },
-      contact: "+1234567890",
-      email: "john.doe@example.com",
-      username: "john_doe",
-      bank_account_no: "1234567890123456",
-      password: "password123",
-      id_proof: "Base64 encoded file data",
-      profile_photo: "Base64 encoded file data",
-      role: "employee",
-    },
-  ];
-
-  React.useEffect(() => {
-    (async () => {
-      try {
-        let res = await getEmployees();
-        if (res) {
-          toast({
-            title: "Successful",
-            description: "Employees list has been fetched successfully",
-          });
-        }
-      } catch (e: any) {
-        console.log(e);
-      }
-    })();
-  }, []);
 
   function viewEmployee(empId: string) {
     router.push(`employees/view/${empId}`);
@@ -174,7 +63,8 @@ export default function EmployeesList({
     router.push(`employees/edit/${empId}`);
   }
 
-  function openDeleteModal() {
+  function openDeleteModal(empID: string) {
+    setSelectedEmployee(empID);
     setDeleteModalOpen(true);
   }
 
@@ -187,6 +77,9 @@ export default function EmployeesList({
     try {
       let res: any = await deleteEmployee(empId);
       if (res) {
+        let filteredEmployees = data.filter((employee: any) => employee.employee_id !== empId);
+        console.log(filteredEmployees);
+        setData(filteredEmployees);
         toast({
           title: "Successful",
           description: `Employee ${empId} has been deleted successfully`,
@@ -205,8 +98,15 @@ export default function EmployeesList({
     }
   }
 
+  if (error) {
+    return <div>Error fetching data: {error}</div>;
+  }
+
   return (
     <div className={cn("grid gap-2", className)} {...props}>
+      {isDataLoading ? (
+        <Icons.spinner className="mx-auto my-4 h-6 w-6 animate-spin" />
+      ) : (
       <Table>
         <TableHeader>
           <TableRow>
@@ -218,12 +118,12 @@ export default function EmployeesList({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {empData.map((row: any) => {
+          {data?.map((row: any) => {
             return (
               <TableRow key={row.employee_id}>
                 <TableCell>{row.employee_id}</TableCell>
                 <TableCell>
-                  {row.name.firstname + " " + row.name.lastname}
+                  {row.name && row.name}
                 </TableCell>
                 <TableCell>{row.email}</TableCell>
                 <TableCell>{row.contact}</TableCell>
@@ -238,31 +138,29 @@ export default function EmployeesList({
                       <DropdownMenuContent className="w-16">
                         <DropdownMenuItem
                           className="cursor-pointer"
-                          onClick={() => viewEmployee("TEST")}
+                          onClick={() => viewEmployee(row.employee_id)}
                         >
                           <View size={16} />
                           <span className="pl-2">View</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="cursor-pointer"
-                          onClick={() => editEmployee("TEST")}
+                          onClick={() => editEmployee(row.employee_id)}
                         >
                           <PencilLine size={16} />
                           <span className="pl-2">Edit</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => openDeleteModal()}
                           className="cursor-pointer"
                         >
-                          <AlertDialogTrigger asChild>
-                            <Button
+                          <Button
                               variant="link"
                               className="-mx-[14px] -my-2 font-normal hover:no-underline"
+                              onClick={() => openDeleteModal(row.employee_id)}
                             >
                               <Trash2 size={16} />
                               <span className="pl-2">Delete</span>
                             </Button>
-                          </AlertDialogTrigger>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -286,10 +184,7 @@ export default function EmployeesList({
                         </AlertDialogCancel>
                         <AlertDialogAction
                           disabled={isLoading}
-                          onClick={() => {
-                            deleteEmployeeById("BS12");
-                          }}
-                        >
+                          onClick={() => deleteEmployeeById(selectedEmployee)}>
                           {isLoading ? (
                             <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
                           ) : (
@@ -306,6 +201,7 @@ export default function EmployeesList({
           })}
         </TableBody>
       </Table>
+      )}
     </div>
   );
 }
