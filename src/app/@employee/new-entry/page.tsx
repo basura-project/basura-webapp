@@ -7,6 +7,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 //Shadcn components
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -30,11 +38,11 @@ import {
   } from "@/components/ui/breadcrumb";
 
 //services
-import { addGarbageEntry } from "../../../services";
+import { addGarbageEntry, getProperties, getPropertyDetails } from "../../../services";
 
 // Mock property data
-type MockProperty = {
-    id: string;
+type Property = {
+    property_id: string;
     client_id: string;
     client_type: string;
     client_name: string;
@@ -42,33 +50,7 @@ type MockProperty = {
     street_name: string;
     chute_present: string;
     timestamp: string;
-    garbageAttributes: string[];
 };
-
-const mockProperties: MockProperty[] = [
-    {
-        id: "PROP12345",
-        client_id: "CLI2347",
-        client_type: "residential",
-        client_name: "John Doe",
-        borough_name: "Manhattan",
-        street_name: "5th Avenue",
-        chute_present: "yes",
-        timestamp: "2024-08-15T14:30:00Z",
-        garbageAttributes: ["plastic", "Cardboard"],
-    },
-    {
-        id: "PROP12346",
-        client_id: "CLI2347",
-        client_type: "commercial",
-        client_name: "ABC Corp",
-        borough_name: "Brooklyn",
-        street_name: "Bedford Avenue",
-        chute_present: "no",
-        timestamp: "2024-08-15T14:30:00Z",
-        garbageAttributes: ["plastic", "Glass"],
-    }
-];
 
 // Zod schema for form validation
 const formSchema = z.object({
@@ -80,7 +62,6 @@ const formSchema = z.object({
   street_name: z.string().min(2, "Street name is required"),
   timestamp: z.string().min(2, "Timestamp must be included"),
   chute_present: z.enum(["yes", "no"]),
-  garbage_attributes: z.array(z.string()).min(1, "At least one garbage attribute is required"),
   created_by: z.string().min(1, "Created by"),
   metal: z.number().min(0),
   glass: z.number().min(0),
@@ -96,6 +77,12 @@ type FormValues = z.infer<typeof formSchema>;
 
 const NewEntryPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [properties, setProperties ] = useState<Property[]>([]);
+
+  const getPropertiesList = async () => {
+    const res = await getProperties();
+    setProperties(res);
+  }
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -107,7 +94,6 @@ const NewEntryPage = () => {
       street_name: "",
       chute_present: "yes",
       timestamp: "2024-08-15T14:30:00Z",
-      garbage_attributes: ["plastic"],
       created_by: "sonu2k",
       metal: 0,
       glass: 0,
@@ -122,16 +108,35 @@ const NewEntryPage = () => {
 
   const { register, handleSubmit, setValue, formState: { errors }, reset } = form;
 
-  const handlePropertySelect = (propertyId: string) => {
-    const property = mockProperties.find(prop => prop.id === propertyId);
+  const handlePropertySelect = async (propertyId: string) => {
+    const property = properties.find(prop => prop.property_id === propertyId);
     if (property) {
-      // Exclude the 'id' field when setting values
-      const { id, ...propertyData } = property;
-      Object.entries(propertyData).forEach(([key, value]) => {
-        setValue(key as keyof FormValues, value);
-      });
-      setValue('property_id', id);
+      console.log(property);
+      try {
+        const propertyDetails = await getPropertyDetails(propertyId);
+        const property = propertyDetails.data;
+        setValue("client_type", property.client_type);
+        setValue("client_name", property.client_name);
+        setValue("borough_name", property.borough_name);
+        setValue("street_name", property.street_name);
+        setValue("chute_present", property.chute_present);
+        setValue("timestamp", property.timestamp);
+        setValue("created_by", property.created_by);
+        setValue("metal", property.metal);
+        setValue("glass", property.glass);
+        setValue("plastic", property.plastic);
+        setValue("eWaste", property.eWaste);
+        setValue("fabric", property.fabric);
+        setValue("cardboard", property.cardboard);
+      } catch (error) {
+        throw error;
+      }
+      setValue('property_id', property.property_id);
     }
+  };
+
+  const handleOnOpenChange = () => {
+    return getPropertiesList();
   };
 
   const onSubmit = async (data: FormValues) => {
@@ -182,7 +187,7 @@ const NewEntryPage = () => {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <Card className="w-full max-w-4xl">
+      <Card className="w-full">
         <CardHeader>
           <CardTitle>Add New Entry</CardTitle>
           <p className="text-sm text-gray-500">
@@ -190,19 +195,42 @@ const NewEntryPage = () => {
           </p>
         </CardHeader>
         <CardContent>
+          <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-6">
-                <div className="space-y-2">
+            <div className="grid grid-cols-1 md:grid-cols-3 sm:gap-20">
+              <div className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="property_id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel htmlFor="propertyId">Property Id</FormLabel>
+                      <Select onValueChange={handlePropertySelect} onOpenChange={handleOnOpenChange} {...field}>
+                        <SelectTrigger id="propertyId">
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {properties.map((property) => (
+                            <SelectItem key={property.property_id} value={property.property_id}>
+                              {property.property_id}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {/* <div className="space-y-1">
                   <Label htmlFor="propertyId">Property Id</Label>
-                  <Select onValueChange={handlePropertySelect}>
+                  <Select onValueChange={handlePropertySelect} onOpenChange={handleOnOpenChange}>
                     <SelectTrigger id="propertyId">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
-                      {mockProperties.map((property) => (
-                        <SelectItem key={property.id} value={property.id}>
-                          Property {property.id}
+                      {properties.map((property) => (
+                        <SelectItem key={property.property_id} value={property.property_id}>
+                          {property.property_id}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -210,10 +238,9 @@ const NewEntryPage = () => {
                   {errors.property_id && (
                     <p className="text-sm text-red-500">{errors.property_id.message}</p>
                   )}
-                </div>
+                </div> */}
 
-                {/* Rest of the form remains the same */}
-                <div className="space-y-2">
+                <div className="space-y-0">
                   <Label htmlFor="clientId">Client Id</Label>
                   <Input 
                     id="clientId" 
@@ -289,22 +316,6 @@ const NewEntryPage = () => {
                     </div>
                   </RadioGroup>
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="garbageAttributes">Garbage Attributes</Label>
-                  <Select>
-                    <SelectTrigger id="garbageAttributes">
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="plastic">Plastic</SelectItem>
-                      <SelectItem value="cardboard">Cardboard</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {errors.garbage_attributes && (
-                    <p className="text-sm text-red-500">{errors.garbage_attributes.message}</p>
-                  )}
-                </div>
               </div>
 
               <div className="space-y-4">
@@ -334,7 +345,8 @@ const NewEntryPage = () => {
                 {isSubmitting ? "Submitting..." : "Submit"}
               </Button>
             </div>
-          </form>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </>
