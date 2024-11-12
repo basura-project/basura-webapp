@@ -94,10 +94,13 @@ export default function ViewClient({ params: { clientID } }: any) {
               <div className="mb-3">
                 <p className="font-medium">Properties :</p>
                 <ul className="flex items-center flex-wrap">
-                  {(showAll ? properties : properties.slice(0, 2)).map((propertyID: string, index: number) => (
+                  {(showAll ? properties : properties?.slice(0, 2)).map((propertyID: string, index: number) => (
                     <li key={propertyID} className="mr-2">
-                      <p className="text-sm">
-                        {index > 0 && ", "}#{propertyID}
+                      <p className="text-sm text-blue-700">
+                        <Link href={`/properties/view/${propertyID}`}>
+                          {index > 0 && ", "}
+                          {propertyID}
+                        </Link>
                       </p>
                     </li>
                   ))}

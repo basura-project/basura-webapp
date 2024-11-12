@@ -77,6 +77,7 @@ export default function MunicipalPropertyForm({ className, ...props }: any) {
       .string()
       .min(1, { message: "Please enter property manager's phone number" })
       .max(50),
+    email: z.string().min(1, { message: "Please enter your email" }),
     isSchool: z
       .string()
       .min(1, { message: " Please select the school details" })
@@ -127,6 +128,7 @@ export default function MunicipalPropertyForm({ className, ...props }: any) {
       chuteFloorLevel: 0,
       noOfFloors: 0,
       noOfBasementFloors: 0,
+      email: ""
     },
   });
 
@@ -155,6 +157,7 @@ export default function MunicipalPropertyForm({ className, ...props }: any) {
         chute_floor_level: values.chuteFloorLevel,
         number_of_floors: values.noOfFloors,
         number_of_basement_floors: values.noOfBasementFloors,
+        email: values.email,
         property_type: "Municipal",
       };
       let res = await addProperty(propertyDetails);
@@ -626,6 +629,28 @@ export default function MunicipalPropertyForm({ className, ...props }: any) {
                   <Input
                     id="propertyManagerContact"
                     placeholder="Property Manager Phone Number"
+                    type="text"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    disabled={isLoading}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel htmlFor="Email">Property Manager Email</FormLabel>
+                <FormControl>
+                  <Input
+                    id="Email"
+                    placeholder="Property Manager Email"
                     type="text"
                     autoCapitalize="none"
                     autoCorrect="off"

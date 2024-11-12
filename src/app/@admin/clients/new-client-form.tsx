@@ -18,17 +18,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
-import { suggestID, addClient, getUnAssignedProperties } from "@/services/index";
+import {
+  suggestID,
+  addClient,
+  getUnAssignedProperties,
+  getPropertyDetails,
+} from "@/services/index";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -38,21 +36,24 @@ export default function NewClientForm({
 }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isError, setIsError] = React.useState<string>("");
-  const [unAssignedProperties, setUnAssignedProperties] = React.useState<any[]>([""]);
+  const [unAssignedProperties, setUnAssignedProperties] = React.useState<any[]>(
+    [""]
+  );
+  const [optionsLoading, setOptionsLoading] = React.useState<boolean>(false);
   const { toast } = useToast();
   const router = useRouter();
 
   React.useEffect(() => {
     const fetchSuggestedId = async () => {
-     try {
-       const response = await suggestID('client');
-       form.setValue("clientID", response.data.suggested_client_id)
-     } catch (err) {
-       console.error(err);
-     }
+      try {
+        const response = await suggestID("client");
+        form.setValue("clientID", response.data.suggested_client_id);
+      } catch (err) {
+        console.error(err);
+      }
     };
     fetchSuggestedId();
- },[]);
+  }, []);
 
   const formSchema = z
     .object({
@@ -60,10 +61,7 @@ export default function NewClientForm({
         .string()
         .min(1, { message: "Please enter Client Id" })
         .max(50),
-      name: z
-        .string()
-        .min(1, { message: "Please enter Client Name" })
-        .max(50),
+      name: z.string().min(1, { message: "Please enter Client Name" }).max(50),
       phone: z
         .string()
         .min(1, { message: "Please enter Client phone number" })
@@ -72,7 +70,10 @@ export default function NewClientForm({
         .string()
         .min(1, { message: "Please enter email" })
         .email("This is not a valid email."),
-      properties: z.array(z.string()).min(1, { message: "Please select a property" }).default([]),
+      properties: z
+        .array(z.string())
+        .min(1, { message: "Please select a property" })
+        .default([]),
       username: z.string().min(1, { message: "Please enter username" }).max(50),
       password: z.string().min(1, { message: "Please enter password" }).max(50),
       confirmPassword: z
@@ -135,25 +136,38 @@ export default function NewClientForm({
   }
 
   const handleOnOpen = async (state: boolean) => {
-    // fetch unassigned properties
+    // Fetch unassigned properties
     if (state) {
+      setOptionsLoading(true);
       try {
-        const properties = await getUnAssignedProperties();
+        const unAssignedProperties = await getUnAssignedProperties();
 
-        // Convert each property string to an object
-        const formattedProperties = properties.map((property: string) => ({
-          label: property,
-          name: property,
-        }));
-        setUnAssignedProperties(formattedProperties);
+        // Convert each property string to an object and wait for all to resolve
+        const formattedProperties = await Promise.all(
+          unAssignedProperties.map(async (property: string) => {
+            const res = await getPropertyDetails(property);
 
+            if (res) {
+              return {
+                label: res.data.property_id,
+                value: res.data.property_id,
+                category: res.data.property_type,
+              };
+            }
+            // Return null or handle missing response appropriately
+            return null;
+          })
+        );
+
+        // Filter out any null results in case getPropertyDetails returned undefined
+        setUnAssignedProperties(formattedProperties.filter(Boolean));
       } catch (err) {
         console.error("Error fetching unassigned properties", err);
+      } finally {
+        setOptionsLoading(false);
       }
-      // fetchProperties();
     }
   };
-
 
   return (
     <div className={cn("grid gap-2", className)} {...props}>
@@ -250,28 +264,14 @@ export default function NewClientForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Properties</FormLabel>
-                {/* <Select
-                  onValueChange={(value) => field.onChange(value)}
-                  defaultValue={field.value?.[0] ?? ""}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="m@example.com">m@example.com</SelectItem>
-                    <SelectItem value="m@google.com">m@google.com</SelectItem>
-                    <SelectItem value="m@support.com">m@support.com</SelectItem>
-                  </SelectContent>
-                </Select> */}
                 <MultiSelect
-                  onOpen={(state)=> handleOnOpen(state)}
+                  onOpen={(state) => handleOnOpen(state)}
                   options={unAssignedProperties}
                   onValueChange={(value) => field.onChange(value)}
                   placeholder="Select"
                   variant="inverted"
                   animation={2}
+                  loading={optionsLoading}
                 />
                 <FormMessage />
               </FormItem>

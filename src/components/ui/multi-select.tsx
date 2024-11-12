@@ -69,6 +69,7 @@ interface MultiSelectProps
     /** The unique value associated with the option. */
     value: string;
     /** Optional icon component to display alongside the option. */
+    category: string;
     icon?: React.ComponentType<{ className?: string }>;
   }[];
 
@@ -119,6 +120,8 @@ interface MultiSelectProps
    * Optional, can be used to add custom styles.
    */
   className?: string;
+  loading?: boolean;
+  isToggleAll?: boolean;
 }
 
 export const MultiSelect = React.forwardRef<
@@ -138,6 +141,8 @@ export const MultiSelect = React.forwardRef<
       modalPopover = false,
       asChild = false,
       className,
+      loading,
+      isToggleAll,
       ...props
     },
     ref
@@ -145,8 +150,14 @@ export const MultiSelect = React.forwardRef<
     const [selectedValues, setSelectedValues] =
       React.useState<string[]>(defaultValue);
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
+    const [selectedCategory, setSelectedCategory] = React.useState<string>("All");
     const [isAnimating, setIsAnimating] = React.useState(false);
-    const [loading, setLoading] = React.useState(false);
+    const triggerRef = React.useRef<HTMLButtonElement>(null);
+    const [popoverWidth, setPopoverWidth] = React.useState(0);
+
+    const uniqueCategories = ["All", ...Array.from(new Set(options.map(option => option.category)))];
+
+
 
     const handleInputKeyDown = (
       event: React.KeyboardEvent<HTMLInputElement>
@@ -175,10 +186,12 @@ export const MultiSelect = React.forwardRef<
     };
 
     const handleTogglePopover = () => {
-      setLoading(true);
       setIsPopoverOpen((prev) => !prev);
-      onOpen?.(!isPopoverOpen);
-      setLoading(false);
+       if (triggerRef.current) {
+        const { width } = triggerRef.current.getBoundingClientRect();
+        setPopoverWidth(width); // Set the width of the PopoverContent dynamically
+       }
+      onOpen?.(!isPopoverOpen)
     };
 
     const clearExtraOptions = () => {
@@ -197,6 +210,10 @@ export const MultiSelect = React.forwardRef<
       }
     };
 
+    const filteredOptions = selectedCategory === "All"
+      ? options
+      : options.filter(option => option.category === selectedCategory);
+
     return (
       <Popover
         open={isPopoverOpen}
@@ -205,7 +222,7 @@ export const MultiSelect = React.forwardRef<
       >
         <PopoverTrigger asChild>
           <Button
-            ref={ref}
+            ref={triggerRef}
             {...props}
             onClick={handleTogglePopover}
             className={cn(
@@ -291,6 +308,7 @@ export const MultiSelect = React.forwardRef<
           className="w-auto p-0"
           align="start"
           onEscapeKeyDown={() => setIsPopoverOpen(false)}
+          style={{ width: popoverWidth}}
         >
           <Command>
             <CommandInput
@@ -300,6 +318,19 @@ export const MultiSelect = React.forwardRef<
             <CommandList>
               <CommandEmpty>No results found.</CommandEmpty>
               <CommandGroup>
+              <div className="flex flex-wrap mb-2 p-2">
+                {uniqueCategories.map(category => (
+                      <Button
+                        key={category}
+                        variant={category === selectedCategory ? "secondary" : "ghost"}
+                        className="m-1"
+                        onClick={() => setSelectedCategory(category)}
+                      >
+                        {category}
+                      </Button>
+                    ))}
+                  </div>
+                {isToggleAll &&  
                 <CommandItem
                   key="all"
                   onSelect={toggleAll}
@@ -317,12 +348,13 @@ export const MultiSelect = React.forwardRef<
                   </div>
                   <span>(Select All)</span>
                 </CommandItem>
+                }
                 {loading ? (
                     <div className="flex justify-center my-4">
                       <Icons.spinner className="h-6 w-6 animate-spin" />
                     </div>
                   ) : (
-                    options.map((option) => {
+                    filteredOptions.map((option) => {
                       const isSelected = selectedValues.includes(option.value);
                       return (
                         <CommandItem
