@@ -209,6 +209,18 @@ export const getProperties = async () => {
   }
 };
 
+// Get unassigned properties
+
+export const getUnAssignedProperties = async () => {
+  try {
+    const response = await apiService.get("unassigned-properties");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching unassigned properties", error);
+    throw error;
+  }
+}
+
 // Get property details
 export const getPropertyDetails = async (propertyId: string) => {
   try {

@@ -31,8 +31,7 @@ export default function Page() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <div className="container">
-        <Card x-chunk="dashboard-05-chunk-3">
+      <Card x-chunk="dashboard-05-chunk-3">
             <div className="hidden space-y-2 p-6 md:block">
               <div className="space-y-0.5">
                 <h2 className="text-xl font-semibold tracking-tight">
@@ -42,8 +41,7 @@ export default function Page() {
               <Separator className="my-6" />
               <GarbageAttributeList />
             </div>
-        </Card>
-      </div>
+      </Card>
     </>
   );
 }

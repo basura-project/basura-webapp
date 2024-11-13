@@ -109,9 +109,9 @@ export default function EditClient({ clientDetails }: any) {
   }
 
   const propertiesMockData = [
-    { value: "PROP12345", label: "PROP12345" },
-    { value: "PROP12346", label: "PROP12346" },
-    { value: "PROP12347", label: "PROP12347"}
+    { value: "PROP12345", label: "PROP12345", category: "Residential"},
+    { value: "PROP12346", label: "PROP12346", category: "Commercial" },
+    { value: "PROP12347", label: "PROP12347", category: "Residential"}
   ];
 
   return (
