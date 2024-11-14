@@ -78,7 +78,7 @@ export default function ClientList({ className, ...props }: UserAuthFormProps) {
         );
         toast({
           title: "Successful",
-          description: `Employee ${clientID} has been deleted successfully`,
+          description: `Client ${clientID} has been deleted successfully`,
         });
       }
       setIsLoading(false);

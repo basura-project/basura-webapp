@@ -118,7 +118,7 @@ export default function NewClientForm({
       if (res) {
         toast({
           title: "Successful",
-          description: "Employee has been created successfully",
+          description: "Client has been created successfully",
         });
       }
       setIsLoading(false);

@@ -275,7 +275,6 @@ export const getClients = async () => {
 export const getClientDetails = async (clientID: string) => {
   try {
     const response = await apiService.get(`client/${clientID}`);
-    console.log(response);
     return response;
   } catch (error) {
     console.error("Error fetching employee details", error);
@@ -396,6 +395,36 @@ export const addGarbageEntry = async (garbage_entry: any) => {
     return response;
   } catch (error) {
     console.error("Error adding a garbage entry", error);
+    throw error;
+  }
+};
+
+// Get property details for Add entry
+export const getPropertyDetailsForAddEntry = async (propertyId: string) => {
+  try {
+    const response = await apiService.get(`property-details/${propertyId}`);
+    if (response.status === 404) {
+      throw new Error("There is no client associated with this property");
+    }
+    return response;
+  } catch (error) {
+    console.error("Error fetching property details", error);
+    throw error;
+  }
+};
+
+// Get garbage submissions
+export const getGarbageSubmissions = async (
+  page: number,
+  pageSize: number
+) => {
+  try {
+    const response = await apiService.get("submissions", {
+      params: { page, page_size: pageSize },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching garbage submissions", error);
     throw error;
   }
 };

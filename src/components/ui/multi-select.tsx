@@ -56,6 +56,14 @@ const multiSelectVariants = cva(
 /**
  * Props for MultiSelect component
  */
+// Option type
+interface Option {
+  label: string;
+  value: string;
+  category: string;
+  /** Optional icon component to display alongside the option. */
+  icon?: React.ComponentType<{ className?: string }>;
+}
 interface MultiSelectProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof multiSelectVariants> {
@@ -63,15 +71,7 @@ interface MultiSelectProps
    * An array of option objects to be displayed in the multi-select component.
    * Each option object has a label, value, and an optional icon.
    */
-  options: {
-    /** The text to display for the option. */
-    label: string;
-    /** The unique value associated with the option. */
-    value: string;
-    /** Optional icon component to display alongside the option. */
-    category: string;
-    icon?: React.ComponentType<{ className?: string }>;
-  }[];
+  options: Option[];
 
   /**
    * Callback function triggered when the selected values change.
@@ -148,7 +148,7 @@ export const MultiSelect = React.forwardRef<
     ref
   ) => {
     const [selectedValues, setSelectedValues] =
-      React.useState<string[]>(defaultValue);
+      React.useState<any[]>(defaultValue);
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
     const [selectedCategory, setSelectedCategory] = React.useState<string>("All");
     const [isAnimating, setIsAnimating] = React.useState(false);
@@ -157,7 +157,10 @@ export const MultiSelect = React.forwardRef<
 
     const uniqueCategories = ["All", ...Array.from(new Set(options.map(option => option.category)))];
 
-
+      // Sync selectedValues with defaultValue changes
+    React.useEffect(() => {
+      setSelectedValues(defaultValue);
+    }, [defaultValue]);
 
     const handleInputKeyDown = (
       event: React.KeyboardEvent<HTMLInputElement>
@@ -231,77 +234,80 @@ export const MultiSelect = React.forwardRef<
             )}
           >
             {selectedValues.length > 0 ? (
-              <div className="flex justify-between items-center w-full">
-                <div className="flex flex-wrap items-center">
-                  {selectedValues.slice(0, maxCount).map((value) => {
-                    const option = options.find((o) => o.value === value);
-                    const IconComponent = option?.icon;
-                    return (
-                      <Badge
-                        key={value}
-                        className={cn(
-                          isAnimating ? "animate-bounce" : "",
-                          multiSelectVariants({ variant })
-                        )}
-                        style={{ animationDuration: `${animation}s` }}
-                      >
-                        {IconComponent && (
-                          <IconComponent className="h-4 w-4 mr-2" />
-                        )}
-                        {option?.label}
-                        <XCircle
-                          className="ml-2 h-4 w-4 cursor-pointer"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            toggleOption(value);
-                          }}
-                        />
-                      </Badge>
-                    );
-                  })}
-                  {selectedValues.length > maxCount && (
+            <div className="flex justify-between items-center w-full">
+              <div className="flex flex-wrap items-center">
+                {selectedValues.slice(0, maxCount).map((value) => {
+                  // Check if options are loaded, and find the corresponding option if available
+                  const option = options.length > 0 ? options.find((o) => o.value === value.value) : null;
+                  const label = option ? option.label : value.label; // Fallback to `value` if option is not found
+                  const IconComponent = option?.icon;
+
+                  return (
                     <Badge
+                      key={value}
                       className={cn(
-                        "bg-transparent text-foreground border-foreground/1 hover:bg-transparent",
                         isAnimating ? "animate-bounce" : "",
                         multiSelectVariants({ variant })
                       )}
                       style={{ animationDuration: `${animation}s` }}
                     >
-                      {`+ ${selectedValues.length - maxCount} more`}
+                      {IconComponent && (
+                        <IconComponent className="h-4 w-4 mr-2" />
+                      )}
+                      {label}
                       <XCircle
                         className="ml-2 h-4 w-4 cursor-pointer"
                         onClick={(event) => {
                           event.stopPropagation();
-                          clearExtraOptions();
+                          toggleOption(value);
                         }}
                       />
                     </Badge>
-                  )}
-                </div>
-                <div className="flex items-center justify-between">
-                  <XIcon
-                    className="h-4 mx-2 cursor-pointer text-muted-foreground"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      handleClear();
-                    }}
-                  />
-                  <Separator
-                    orientation="vertical"
-                    className="flex min-h-6 h-full"
-                  />
-                  <ChevronDown className="h-4 mx-2 cursor-pointer text-muted-foreground" />
-                </div>
+                  );
+                })}
+                {selectedValues.length > maxCount && (
+                  <Badge
+                    className={cn(
+                      "bg-transparent text-foreground border-foreground/1 hover:bg-transparent",
+                      isAnimating ? "animate-bounce" : "",
+                      multiSelectVariants({ variant })
+                    )}
+                    style={{ animationDuration: `${animation}s` }}
+                  >
+                    {`+ ${selectedValues.length - maxCount} more`}
+                    <XCircle
+                      className="ml-2 h-4 w-4 cursor-pointer"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        clearExtraOptions();
+                      }}
+                    />
+                  </Badge>
+                )}
               </div>
-            ) : (
-              <div className="flex items-center justify-between w-full mx-auto">
-                <span className="text-sm text-muted-foreground mx-3">
-                  {placeholder}
-                </span>
-                <ChevronDown className="h-4 cursor-pointer text-muted-foreground mx-2" />
+              <div className="flex items-center justify-between">
+                <XIcon
+                  className="h-4 mx-2 cursor-pointer text-muted-foreground"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleClear();
+                  }}
+                />
+                <Separator
+                  orientation="vertical"
+                  className="flex min-h-6 h-full"
+                />
+                <ChevronDown className="h-4 mx-2 cursor-pointer text-muted-foreground" />
               </div>
-            )}
+            </div>
+          ) : (
+            <div className="flex items-center justify-between w-full mx-auto">
+              <span className="text-sm text-muted-foreground mx-3">
+                {placeholder}
+              </span>
+              <ChevronDown className="h-4 cursor-pointer text-muted-foreground mx-2" />
+            </div>
+          )}
           </Button>
         </PopoverTrigger>
         <PopoverContent

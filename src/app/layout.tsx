@@ -7,6 +7,8 @@ import Cookies from "js-cookie";
 import { Toaster } from "@/components/ui/toaster";
 import Loading from "@/components/ui/loading";
 
+import UserProvider from "@/store";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({
@@ -73,11 +75,13 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={inter.className}>
-        {children}
-        {!isLoading ? role() : <Loading loaded={loaded} />}
-        <Toaster />
-      </body>
+      <UserProvider>
+        <body className={inter.className}>
+          {children}
+          {!isLoading ? role() : <Loading loaded={loaded} />}
+          <Toaster />
+        </body>
+      </UserProvider>
     </html>
   );
 }

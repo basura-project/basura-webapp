@@ -8,6 +8,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
+import Chart from "./components/Chart";
 export default function AnalyticsPage() {
   return (
     <>
@@ -22,19 +23,9 @@ export default function AnalyticsPage() {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <div className="">
-        <Card x-chunk="dashboard-05-chunk-3">
-          <div className="hidden space-y-2 p-6 md:block">
-            <div className="space-y-0.5">
-              <h2 className="text-xl font-semibold tracking-tight">
-                Analytics
-              </h2>
-              <p>Metrics for daily submissions, waste collected</p>
-            </div>
-            <Separator className="my-6" />
-          </div>
-        </Card>
-      </div>
+      <Card className="p-8">
+        <Chart />
+      </Card>
     </>
   );
 }
