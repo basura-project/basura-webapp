@@ -1,5 +1,8 @@
 "use client";
-import React from 'react';
+import React, { useContext } from 'react';
+
+//context
+import { useUser } from '@/store';
 
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/ui/icons";
@@ -94,6 +97,7 @@ const NewEntryPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [properties, setProperties ] = useState<Property[]>([]);
   const [propertiesLoading, setPropertiesLoading] = useState(false);
+  const { user } = useUser();
 
   const getPropertiesList = async () => {
     setPropertiesLoading(true);
@@ -127,7 +131,7 @@ const NewEntryPage = () => {
       borough_name: "",
       chute_present: "yes",
       timestamp: "2024-08-15T14:30:00Z",
-      created_by: "user",
+      created_by: user.name,
       garbage_attributes: garbageTypes.reduce((acc, { key }) => ({
         ...acc,
         [key]: undefined
