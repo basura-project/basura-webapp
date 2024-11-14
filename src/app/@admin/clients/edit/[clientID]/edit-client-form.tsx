@@ -21,12 +21,28 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import { editClient } from "@/services/index";
+import { editClient, getUnAssignedProperties,
+  getPropertyDetails, } from "@/services/index";
 
 export default function EditClient({ clientDetails }: any) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isError, setIsError] = React.useState<string>("");
+  const [unAssignedProperties, setUnAssignedProperties] = React.useState<any[]>(
+    []
+  );
+  const [selectedProperties, setSelectedProperties] = React.useState<string[]>([]);
+  const [optionsLoading, setOptionsLoading] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    const preselectData = clientDetails.properties.map((property: string) => {
+      return {
+        label: property,
+        value: property,
+      };
+    })
+    setSelectedProperties(preselectData);
+  },[]);
 
   const formSchema = z
     .object({
@@ -68,7 +84,7 @@ export default function EditClient({ clientDetails }: any) {
       email: clientDetails.email,
       username: clientDetails.username,
       password: "",
-      properties: []
+      properties: clientDetails.properties
     },
   });
 
@@ -108,11 +124,39 @@ export default function EditClient({ clientDetails }: any) {
     form.reset();
   }
 
-  const propertiesMockData = [
-    { value: "PROP12345", label: "PROP12345", category: "Residential"},
-    { value: "PROP12346", label: "PROP12346", category: "Commercial" },
-    { value: "PROP12347", label: "PROP12347", category: "Residential"}
-  ];
+  const handleOnOpen = async (state: boolean) => {
+    // Fetch unassigned properties
+    if (state) {
+      setOptionsLoading(true);
+      try {
+        const unAssignedProperties = await getUnAssignedProperties();
+
+        // Convert each property string to an object and wait for all to resolve
+        const formattedProperties = await Promise.all(
+          unAssignedProperties.map(async (property: string) => {
+            const res = await getPropertyDetails(property);
+
+            if (res) {
+              return {
+                label: res.data.property_id,
+                value: res.data.property_id,
+                category: res.data.property_type,
+              };
+            }
+            // Return null or handle missing response appropriately
+            return null;
+          })
+        );
+
+        // Filter out any null results in case getPropertyDetails returned undefined
+        setUnAssignedProperties(formattedProperties.filter(Boolean));
+      } catch (err) {
+        console.error("Error fetching unassigned properties", err);
+      } finally {
+        setOptionsLoading(false);
+      }
+    }
+  };
 
   return (
     <Form {...form}>
@@ -209,14 +253,16 @@ export default function EditClient({ clientDetails }: any) {
             <FormItem>
               <FormLabel>Properties</FormLabel>
               <FormControl>
-                <MultiSelect
-                    options={propertiesMockData}
-                    defaultValue={clientDetails.properties}
-                    onValueChange={(value) => field.onChange(value)}
-                    placeholder="Select"
-                    variant="inverted"
-                    animation={2}
-                  />
+              <MultiSelect
+                  onOpen={(state) => handleOnOpen(state)}
+                  options={unAssignedProperties || selectedProperties}
+                  onValueChange={(value) => field.onChange(value)}
+                  defaultValue={selectedProperties}
+                  placeholder="Select"
+                  variant="inverted"
+                  animation={2}
+                  loading={optionsLoading}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

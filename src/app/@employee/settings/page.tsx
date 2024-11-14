@@ -1,22 +1,7 @@
 "use client";
 import React from "react";
-import SubmissionsList from "./components/list";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ChevronDown, MoreHorizontal, Timer } from "lucide-react";
+import Settings from "./components/Settings";
+
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -49,12 +34,12 @@ const SubmissionsPage = () => {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink href="/submissions">Submissions</BreadcrumbLink>
+            <BreadcrumbLink href="/submissions">Settings</BreadcrumbLink>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
       <Card className="p-8">
-        <SubmissionsList />
+        <Settings />
       </Card>
     </>
   );
