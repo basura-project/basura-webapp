@@ -81,10 +81,6 @@ export default function NewEmployeeForm({
         .string()
         .min(1, { message: "Please enter routing number" })
         .max(9),
-      swiftCode: z
-        .string()
-        .min(1, { message: "Please enter swift code" })
-        .max(6),
       username: z.string().min(1, { message: "Please enter username" }).max(50),
       password: z.string().min(1, { message: "Please enter password" }).max(50),
       confirmPassword: z
@@ -109,7 +105,6 @@ export default function NewEmployeeForm({
       secondaryEmail: "",
       bankAccountNo: "",
       routingNo: "",
-      swiftCode: "",
       username: "",
       password: "",
       confirmPassword: "",
@@ -131,7 +126,6 @@ export default function NewEmployeeForm({
         secondary_email: values.secondaryEmail,
         bank_account_no: values.bankAccountNo,
         routing_no: values.routingNo,
-        swift_code: values.swiftCode,
         username: values.username,
         password: values.password,
         role: "employee",
@@ -340,27 +334,6 @@ export default function NewEmployeeForm({
                   <Input
                     id="routingNo"
                     placeholder="Routing Number"
-                    type="text"
-                    autoCapitalize="none"
-                    autoCorrect="off"
-                    disabled={isLoading}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="swiftCode"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Swift Code</FormLabel>
-                <FormControl>
-                  <Input
-                    id="swiftCode"
-                    placeholder="Swift Code"
                     type="text"
                     autoCapitalize="none"
                     autoCorrect="off"

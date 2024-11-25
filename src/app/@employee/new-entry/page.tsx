@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 
 //context
 import { useUser } from '@/store';
@@ -44,31 +44,28 @@ import {
   } from "@/components/ui/breadcrumb";
 
 //services
-import { addGarbageEntry, getProperties, getPropertyDetailsForAddEntry } from "../../../services";
+import { addGarbageEntry, getProperties, getPropertyDetailsForAddEntry, getGarbageAttributes } from "../../../services";
 import { timeStamp } from 'console';
 
-type GarbageAttributes = {
-  metal: number;
-  glass: number;
-  plastic: number;
-  eWaste: number;
-  fabric: number;
-  cardboard: number;
-  otherPaper: number;
-  landfill: number;
-};
+interface GarbageAttributes {
+  [key: string]: number;
+}
 
 // Mock property data
+type CommonStringFields = 
+  'property_id' | 
+  'client_id' | 
+  'client_type' | 
+  'client_name' | 
+  'borough_name' | 
+  'street_name' | 
+  'chute_present' | 
+  'timestamp';
+
 type Property = {
-    property_id: string;
-    client_id: string;
-    client_type: string;
-    client_name: string;
-    borough_name: string;
-    street_name: string;
-    chute_present: string;
-    timestamp: string;
-    garbage_attributes: GarbageAttributes
+  [K in CommonStringFields]: string;
+} & {
+  garbage_attributes: GarbageAttributes;
 };
 
 // Zod schema for form validation
@@ -97,7 +94,24 @@ const NewEntryPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [properties, setProperties ] = useState<Property[]>([]);
   const [propertiesLoading, setPropertiesLoading] = useState(false);
+  const [garbageAttributes, setGarbageAttributes] = useState<GarbageAttributes[]>([]);
   const { user } = useUser();
+
+  useEffect(()=> {
+
+    const fetchAttributes = async () => {
+      try {
+        const res = await getGarbageAttributes();
+        console.log(res);
+        setGarbageAttributes(res);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    fetchAttributes();
+      
+  }, [])
 
   const getPropertiesList = async () => {
     setPropertiesLoading(true);
@@ -110,17 +124,6 @@ const NewEntryPage = () => {
     }
   }
 
-  const garbageTypes = [
-    { key: "metal", label: "Metal" },
-    { key: "glass", label: "Glass" },
-    { key: "plastic", label: "Plastic" },
-    { key: "eWaste", label: "E-Waste" },
-    { key: "fabric", label: "Fabric" },
-    { key: "cardboard", label: "Cardboard" },
-    { key: "otherPaper", label: "Other Paper" },
-    { key: "landfill", label: "Landfill" },
-  ] as const;
-
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -132,9 +135,9 @@ const NewEntryPage = () => {
       chute_present: "yes",
       timestamp: "2024-08-15T14:30:00Z",
       created_by: user.name,
-      garbage_attributes: garbageTypes.reduce((acc, { key }) => ({
+      garbage_attributes: garbageAttributes.reduce((acc, { attribute_name }) => ({
         ...acc,
-        [key]: undefined
+        [attribute_name]: undefined
       }), {})
     },
   });
@@ -269,6 +272,7 @@ const NewEntryPage = () => {
                       <FormLabel>Client Id</FormLabel>
                       <FormControl>
                         <Input
+                          disabled
                           id="clientID"
                           placeholder="Client Id"
                           type="text"
@@ -289,6 +293,7 @@ const NewEntryPage = () => {
                       <FormLabel>Client Type</FormLabel>
                       <FormControl>
                         <Input
+                          disabled
                           id="clientType"
                           placeholder="Client Type"
                           type="text"
@@ -310,6 +315,7 @@ const NewEntryPage = () => {
                       <FormLabel>Client Name</FormLabel>
                       <FormControl>
                         <Input
+                          disabled
                           id="Name"
                           placeholder="Name"
                           type="text"
@@ -331,6 +337,7 @@ const NewEntryPage = () => {
                       <FormLabel htmlFor="boroughName">Borough Name</FormLabel>
                       <FormControl>
                         <Input
+                          disabled
                           id="boroughName"
                           placeholder="Name"
                           type="text"
@@ -351,6 +358,7 @@ const NewEntryPage = () => {
                         <FormLabel htmlFor="streetName">Street Name</FormLabel>
                         <FormControl>
                           <Input
+                            disabled
                             id="streetName"
                             placeholder="Street Name"
                             type="text"
@@ -372,6 +380,7 @@ const NewEntryPage = () => {
                       <FormLabel htmlFor="chutePresent">Chute Present</FormLabel>
                       <FormControl>
                         <RadioGroup
+                          disabled
                           value={field.value}
                           onValueChange={field.onChange}
                           className="flex"
@@ -395,19 +404,19 @@ const NewEntryPage = () => {
 
               <div className="space-y-4">
                 <h3 className="font-medium text-lg">Garbage Segregation</h3>
-                {garbageTypes.map(({ key, label }) => (
+                {garbageAttributes.map(({ attribute_name }, index) => (
                   <FormField
-                    key={key}
+                    key={attribute_name}
                     control={form.control}
-                    name={`garbage_attributes.${key}`}
+                    name={`garbage_attributes.${attribute_name}`}
                     render={({ field }) => (
                       <FormItem>
                         <div className="flex items-center gap-4">
-                          <FormLabel className="w-24">{label}</FormLabel>
+                          <FormLabel className="w-24 leading-6">{attribute_name}</FormLabel>
                           <FormControl>
                             <Input
                               type="number"
-                              id={key}
+                              id={`garbage-attribute-${attribute_name}`}
                               {...field}
                               onChange={(e) => {
                                 const value = e.target.valueAsNumber;

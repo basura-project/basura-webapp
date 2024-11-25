@@ -19,6 +19,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox"
@@ -416,33 +425,38 @@ export default function ResidentPropertyForm({
             name="apartmentType"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Apartment Type ( No. of bedrooms )</FormLabel>
-                <FormControl>
-                  <RadioGroup
-                    id="apartmentType"
-                    defaultValue={field.value}
-                    onValueChange={field.onChange}
-                    className="flex"
-                  >
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="1BHK" id="r1" />
-                      <Label htmlFor="r1">1 BHK</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="2BHK" id="r2" />
-                      <Label htmlFor="r2">2 BHK</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="3BHK" id="r3" />
-                      <Label htmlFor="r3">3 BHK</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="3+BHK" id="r4" />
-                      <Label htmlFor="r4">3+ BHK</Label>
-                    </div>
-                  </RadioGroup>
-                </FormControl>
-                <FormMessage />
+                <FormLabel>Apartment</FormLabel>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Apartment Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>No. of bedrooms</SelectLabel>
+                      <SelectItem value="1BHK">1 BHK</SelectItem>
+                      <SelectItem value="2BHK">2 BHK</SelectItem>
+                      <SelectItem value="3BHK">3 BHK</SelectItem>
+                      <SelectItem value="4BHK">4 BHK</SelectItem>
+                      <SelectItem value="5BHK">5 BHK</SelectItem>
+                      <SelectItem value="6BHK">6 BHK</SelectItem>
+                      <SelectItem value="7BHK">7 BHK</SelectItem>
+                      <SelectItem value="8BHK">8 BHK</SelectItem>
+                      <SelectItem value="9BHK">9 BHK</SelectItem>
+                      <SelectItem value="10BHK">10 BHK</SelectItem>
+                      <SelectItem value="11BHK">11 BHK</SelectItem>
+                      <SelectItem value="12BHK">12 BHK</SelectItem>
+                      <SelectItem value="19BHK">13 BHK</SelectItem>
+                      <SelectItem value="14BHK">14 BHK</SelectItem>
+                      <SelectItem value="15BHK">15 BHK</SelectItem>
+                      <SelectItem value="16BHK">16 BHK</SelectItem>
+                      <SelectItem value="17BHK">17 BHK</SelectItem>
+                      <SelectItem value="18BHK">18 BHK</SelectItem>
+                      <SelectItem value="19BHK">19 BHK</SelectItem>
+                      <SelectItem value="20BHK">20 BHK</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+              </Select>
+              <FormMessage />
               </FormItem>
             )}
           />

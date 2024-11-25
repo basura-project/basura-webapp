@@ -158,9 +158,9 @@ export const MultiSelect = React.forwardRef<
     const uniqueCategories = ["All", ...Array.from(new Set(options.map(option => option.category)))];
 
       // Sync selectedValues with defaultValue changes
-    React.useEffect(() => {
-      setSelectedValues(defaultValue);
-    }, [defaultValue]);
+    // React.useEffect(() => {
+    //   setSelectedValues(defaultValue);
+    // }, []);
 
     const handleInputKeyDown = (
       event: React.KeyboardEvent<HTMLInputElement>
@@ -254,7 +254,7 @@ export const MultiSelect = React.forwardRef<
                       {IconComponent && (
                         <IconComponent className="h-4 w-4 mr-2" />
                       )}
-                      {label}
+                      {value}
                       <XCircle
                         className="ml-2 h-4 w-4 cursor-pointer"
                         onClick={(event) => {

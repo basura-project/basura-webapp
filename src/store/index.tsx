@@ -1,10 +1,14 @@
 "use client";
 import { createContext, useState, Dispatch, SetStateAction, useContext, useEffect, ReactNode } from "react";
+import Cookies from "js-cookie";
+
 import { userDetails } from "@/services";
 
 export type User = {
   name: string;
-  email: string;
+  email?: string;
+  role: string;
+  username: string;
 };
 
 export interface UserContextInterface {
@@ -20,25 +24,35 @@ type UserProviderProps = {
 };
 
 export function UserProvider({ children }: UserProviderProps) {
-  const [user, setUser] = useState<User>({ name: "", email: "" });
+  const [user, setUser] = useState<User>({ name: "", email: "", role: "", username: ""});
 
-//   useEffect(() => {
-//     const fetchUserDetails = async () => {
-//         try {
-//           const details = "";
-//           if (details) {
-//             setUser({
-//               name: details.data.name.firstname,
-//               email: details.data.email,
-//             });
-//           }
-//         } catch (error) {
-//           console.error("Failed to fetch user details:", error);
-//         }
-//       };
-    
-//       fetchUserDetails();
-//   }, []); // Empty dependency array to ensure this runs only once on mount
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      const access_token = Cookies.get('access_token');
+      if (access_token) {
+        try {
+          const res = await userDetails(); // Fetch user details
+          if (res) {
+
+            // Set user state with role-based details
+            setUser({
+              name: res.data.name &&  res.data.name.firstname + res.data.name.lastname,
+              email: res.data.email && res.data.email,
+              role: res.data.role,
+              username: res.data.username && res.data.username, // Assuming username is unique across all users
+            });
+
+            // Role-specific actions
+            // handleRoleSpecificLogic(role, res.data);
+          }
+        } catch (error) {
+          console.error('Error fetching user details:', error);
+        }
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
 
   return (
     <UserContext.Provider value={{ user, setUser }}>
