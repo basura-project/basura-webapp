@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, redirect } from "next/navigation";
+import { useUser } from "@/store"; // Import your UserContext hook
 import Cookies from "js-cookie";
 
 import { z } from "zod";
@@ -21,15 +22,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import { login } from "@/services/index";
+import { login, userDetails } from "@/services/index";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const router = useRouter();
+  const { setUser } = useUser(); // Access UserContext's `setUser` function
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isError, setIsError] = React.useState<string>("");
 
+  // Form schema validation
   const formSchema = z.object({
     username: z
       .string()
@@ -49,24 +52,51 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     },
   });
 
+  // Handle form submission
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setIsError("");
 
     try {
-      let res = await login(values);
-      if (res.data) {
-        Cookies.set("access_token", res.data.access_token);
-        Cookies.set("refresh_token", res.data.refresh_token);
-        location.reload();
+      // Login API call
+      const loginRes = await login(values);
+      if (loginRes.data) {
+        // Store tokens in cookies
+        Cookies.set("access_token", loginRes.data.access_token);
+        Cookies.set("refresh_token", loginRes.data.refresh_token);
+
+        // Fetch user details after login
+        const userDetailsRes = await userDetails();
+
+        // Set user details in UserContext
+        if (userDetailsRes.data) {
+          setUser(userDetailsRes.data); // Assuming setUser updates the UserContext state
+        }
+
+        // Redirect to role-based dashboard
+        const userRole = userDetailsRes.data.role;
+        switch (userRole) {
+          case "admin":
+            router.push("/admin");
+            break;
+          case "employee":
+            router.push("/new-entry");
+            break;
+          case "client":
+            router.push("/client");
+            break;
+          default:
+            router.push("/auth");
+        }
       }
-      setIsLoading(false);
     } catch (e: any) {
+      // Handle errors
       setIsLoading(false);
       if (e.response && e.response.data) {
         setIsError(e.response.data.error);
       }
-      console.log(e);
+    } finally {
+      setIsLoading(false);
     }
   }
 
