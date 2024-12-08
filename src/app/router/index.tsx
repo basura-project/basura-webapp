@@ -21,15 +21,15 @@ export const UserRouter = ({
 
   useEffect(() => {
     // Set default route dynamically based on user role
-    if (user?.role) {
+    if (user) {
       setDefaultRoute(user.role);
     } else {
       setDefaultRoute("auth");
     }
 
     // Simulate loading time
-    setTimeout(() => setIsLoading(false), 500);
-  }, [user]);
+    setTimeout(() => setIsLoading(false), 200);
+  }, [user, defaultRoute]);
 
   // Map defaultRoute to the appropriate layout component
   const routeComponents: { [key: string]: React.ReactNode } = {
