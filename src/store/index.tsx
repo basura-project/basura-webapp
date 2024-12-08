@@ -24,7 +24,7 @@ type UserProviderProps = {
 };
 
 export function UserProvider({ children }: UserProviderProps) {
-  const [user, setUser] = useState<User>({ name: "", email: "", role: "", username: ""});
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -33,17 +33,12 @@ export function UserProvider({ children }: UserProviderProps) {
         try {
           const res = await userDetails(); // Fetch user details
           if (res) {
-
-            // Set user state with role-based details
             setUser({
-              name: res.data.name &&  res.data.name.firstname + res.data.name.lastname,
+              name: res.data.name && res.data.name.firstname + res.data.name.lastname,
               email: res.data.email && res.data.email,
               role: res.data.role,
-              username: res.data.username && res.data.username, // Assuming username is unique across all users
+              username: res.data.username && res.data.username,
             });
-
-            // Role-specific actions
-            // handleRoleSpecificLogic(role, res.data);
           }
         } catch (error) {
           console.error('Error fetching user details:', error);
@@ -55,11 +50,12 @@ export function UserProvider({ children }: UserProviderProps) {
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ user: user as User, setUser: setUser as Dispatch<SetStateAction<User>> }}>
       {children}
     </UserContext.Provider>
   );
 }
+
 
 // Custom hook to access the user context, throwing an error if used outside of the provider.
 export const useUser = () => {

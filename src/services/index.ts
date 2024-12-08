@@ -428,3 +428,26 @@ export const getGarbageSubmissions = async (
     throw error;
   }
 };
+
+// Delete garbage entry
+export interface Params {
+  property_id: string;
+  client_id: string;
+  timestamp: string;
+  created_by: string;
+}
+
+export const deleteGarbageEntry = async (params: Params) => {
+  try {
+    const response = await apiService.delete("delete-entry", {
+      headers: {
+        "Content-Type": "application/json", // Set content type
+      },
+      data: params, // Pass JSON in the request body
+      });
+    return response;
+  } catch (error) {
+    console.error("Error deleting garbage entry", error);
+    throw error;
+  }
+};
