@@ -95,6 +95,9 @@ const NewEntryPage = () => {
   const [properties, setProperties ] = useState<Property[]>([]);
   const [propertiesLoading, setPropertiesLoading] = useState(false);
   const [garbageAttributes, setGarbageAttributes] = useState<GarbageAttributes[]>([]);
+  const [filteredProperties, setFilteredProperties] = useState(properties); 
+  const [searchTerm, setSearchTerm] = useState('');
+
   const { user } = useUser();
 
   useEffect(()=> {
@@ -111,7 +114,15 @@ const NewEntryPage = () => {
 
     fetchAttributes();
       
-  }, [])
+  }, []);
+
+  //Search filter
+  useEffect(() => {
+    const filtered = properties.filter((property) =>
+      property.property_id.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredProperties(filtered);
+  }, [searchTerm, properties]);
 
   const getPropertiesList = async () => {
     setPropertiesLoading(true);
@@ -167,6 +178,10 @@ const NewEntryPage = () => {
         }        
       }
     }
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
   };
 
   const handleOnOpenChange = () => {
@@ -246,12 +261,13 @@ const NewEntryPage = () => {
                             <SelectValue placeholder="Select" />
                           </SelectTrigger>
                           <SelectContent>
+                            <Input type="text" placeholder="Search property ID" value={searchTerm} onChange={handleSearchChange} />
                             {propertiesLoading? (
                               <div className='flex justify-center'>
                                 <Icons.spinner className="mr-2 h-4 w-4 animate-spin text-center" />
                               </div>
                             ) : (
-                              properties.map((property) => (
+                              filteredProperties.map((property) => (
                                 <SelectItem key={property.property_id} value={property.property_id}>
                                   {property.property_id}
                                 </SelectItem> )

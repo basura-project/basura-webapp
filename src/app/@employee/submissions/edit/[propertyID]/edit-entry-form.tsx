@@ -35,13 +35,6 @@ import {
 } from "@/components/ui/select";
 import { useState } from 'react';
 import { toast } from "@/components/ui/use-toast";
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbSeparator,
-  } from "@/components/ui/breadcrumb";
 
 //services
 import { addGarbageEntry, getProperties, getPropertyDetailsForAddEntry, getGarbageAttributes } from "@/services";
@@ -90,19 +83,22 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-const NewEntryPage = () => {
+const EditEntryForm = ({ entry }: any) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [properties, setProperties ] = useState<Property[]>([]);
+  const [filteredProperties, setFilteredProperties] = useState(properties); 
   const [propertiesLoading, setPropertiesLoading] = useState(false);
   const [garbageAttributes, setGarbageAttributes] = useState<GarbageAttributes[]>([]);
-  const { user } = useUser();
+  const [searchTerm, setSearchTerm] = useState('');
+
 
   useEffect(()=> {
+
+    form.setValue('property_id', entry.property_id);
 
     const fetchAttributes = async () => {
       try {
         const res = await getGarbageAttributes();
-        console.log(res);
         setGarbageAttributes(res);
       } catch (err) {
         console.error(err);
@@ -112,6 +108,13 @@ const NewEntryPage = () => {
     fetchAttributes();
       
   }, [])
+
+  useEffect(() => {
+    const filtered = properties.filter((property) =>
+      property.property_id.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredProperties(filtered);
+  }, [searchTerm, properties]);
 
   const getPropertiesList = async () => {
     setPropertiesLoading(true);
@@ -127,20 +130,19 @@ const NewEntryPage = () => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      property_id: "",
-      client_id: "",
-      client_type: "",
-      client_name: "",
-      borough_name: "",
-      chute_present: "yes",
-      timestamp: "2024-08-15T14:30:00Z",
-      created_by: user.name,
-      garbage_attributes: garbageAttributes.reduce((acc, { attribute_name }) => ({
-        ...acc,
-        [attribute_name]: undefined
-      }), {})
+      property_id: entry.property_id,
+      client_id: entry.client_id,
+      client_type: entry.client_type,
+      client_name: entry.client_name,
+      borough_name: entry.borough_name,
+      chute_present: entry.chute_present,
+      created_by: entry.created_by,
+      garbage_attributes: Object.fromEntries(
+        Object.entries(entry.garbage_attributes).map(([key, value]) => [key, Number(value)])
+      ),
     },
   });
+
 
   const { handleSubmit, setValue, formState: { errors }, reset } = form;
 
@@ -167,6 +169,10 @@ const NewEntryPage = () => {
         }        
       }
     }
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
   };
 
   const handleOnOpenChange = () => {
@@ -204,22 +210,11 @@ const NewEntryPage = () => {
 
   return (
     <>
-      <Breadcrumb className="hidden md:flex -mt-[44px] z-50">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">New Entry</BreadcrumbLink>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className="text-2xl">Add New Entry</CardTitle>
+          <CardTitle className="text-2xl">Edit Entry</CardTitle>
           <p className="text-md text-gray-800 pt-0">
-            Add a new garbage entry, verify all the details before submission.
+            Edit garbage entry, verify all the details before submission.
           </p>
         </CardHeader>
         <CardContent>
@@ -232,7 +227,7 @@ const NewEntryPage = () => {
                   name="property_id"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel htmlFor="propertyId">Property Id</FormLabel>
+                      <FormLabel htmlFor="propertyId">Property Id</FormLabel> 
                       <FormControl>
                         <Select
                           value={field.value}
@@ -243,15 +238,16 @@ const NewEntryPage = () => {
                           onOpenChange={handleOnOpenChange}
                         >
                           <SelectTrigger id="propertyId">
-                            <SelectValue placeholder="Select" />
+                            <SelectValue placeholder="Select" >{field.value && field.value}</SelectValue>
                           </SelectTrigger>
                           <SelectContent>
+                            <Input type="text" placeholder="Search property ID" value={searchTerm} onChange={handleSearchChange} />
                             {propertiesLoading? (
                               <div className='flex justify-center'>
                                 <Icons.spinner className="mr-2 h-4 w-4 animate-spin text-center" />
                               </div>
                             ) : (
-                              properties.map((property) => (
+                              filteredProperties.map((property) => (
                                 <SelectItem key={property.property_id} value={property.property_id}>
                                   {property.property_id}
                                 </SelectItem> )
@@ -272,7 +268,6 @@ const NewEntryPage = () => {
                       <FormLabel>Client Id</FormLabel>
                       <FormControl>
                         <Input
-                          disabled
                           id="clientID"
                           placeholder="Client Id"
                           type="text"
@@ -469,4 +464,4 @@ const NewEntryPage = () => {
   );
 };
 
-export default NewEntryPage;
+export default EditEntryForm;

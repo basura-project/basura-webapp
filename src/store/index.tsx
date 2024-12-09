@@ -14,6 +14,7 @@ export type User = {
 export interface UserContextInterface {
   user: User;
   setUser: Dispatch<SetStateAction<User>>;
+  fetchTime: number;
 }
 
 // Making the context value optional and handling cases where it's accessed without a provider.
@@ -25,9 +26,13 @@ type UserProviderProps = {
 
 export function UserProvider({ children }: UserProviderProps) {
   const [user, setUser] = useState<User | null>(null);
+  const [apiRequestTime, setApiRequestTime] = useState(0); 
+
 
   useEffect(() => {
+
     const fetchUserDetails = async () => {
+      const startTime = performance.now();
       const access_token = Cookies.get('access_token');
       if (access_token) {
         try {
@@ -42,6 +47,9 @@ export function UserProvider({ children }: UserProviderProps) {
           }
         } catch (error) {
           console.error('Error fetching user details:', error);
+        } finally {
+          const endTime = performance.now();
+          setApiRequestTime(endTime - startTime); 
         }
       }
     };
@@ -50,7 +58,7 @@ export function UserProvider({ children }: UserProviderProps) {
   }, []);
 
   return (
-    <UserContext.Provider value={{ user: user as User, setUser: setUser as Dispatch<SetStateAction<User>> }}>
+    <UserContext.Provider value={{ user: user as User, setUser: setUser as Dispatch<SetStateAction<User>>, fetchTime: apiRequestTime }}>
       {children}
     </UserContext.Provider>
   );
