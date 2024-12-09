@@ -87,6 +87,7 @@ export const EditEntryForm = ({ entry }: any) => {
   const [properties, setProperties ] = useState<Property[]>([]);
   const [propertiesLoading, setPropertiesLoading] = useState(false);
   const [garbageAttributes, setGarbageAttributes] = useState<GarbageAttributes[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const { user } = useUser();
 
   useEffect(()=> {
@@ -125,7 +126,7 @@ export const EditEntryForm = ({ entry }: any) => {
       client_name: "",
       borough_name: "",
       chute_present: "yes",
-      timestamp: "2024-08-15T14:30:00Z",
+      timestamp: new Date().toISOString(),
       created_by: user.name,
       garbage_attributes: garbageAttributes.reduce((acc, { attribute_name }) => ({
         ...acc,
@@ -159,6 +160,10 @@ export const EditEntryForm = ({ entry }: any) => {
         }        
       }
     }
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
   };
 
   const handleOnOpenChange = () => {
@@ -226,7 +231,8 @@ export const EditEntryForm = ({ entry }: any) => {
                             <SelectValue placeholder="Select" />
                           </SelectTrigger>
                           <SelectContent>
-                            {propertiesLoading? (
+                            {/* <input type="text" placeholder="Search property ID" value={searchTerm} onChange={handleSearchChange} /> */}
+                            {/* {propertiesLoading? (
                               <div className='flex justify-center'>
                                 <Icons.spinner className="mr-2 h-4 w-4 animate-spin text-center" />
                               </div>
@@ -235,7 +241,7 @@ export const EditEntryForm = ({ entry }: any) => {
                                 <SelectItem key={property.property_id} value={property.property_id}>
                                   {property.property_id}
                                 </SelectItem> )
-                            ))}
+                            ))} */}
                             
                           </SelectContent>
                         </Select>

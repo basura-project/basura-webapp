@@ -1,6 +1,6 @@
 "use client";
-import React from "react";
-import { EditEntryForm } from "../../components/form";
+import React, { useEffect, useState } from "react";
+import EditEntryForm from "./edit-entry-form";
 import {
   Table,
   TableBody,
@@ -27,18 +27,51 @@ import {
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
-const SubmissionsPage = () => {
-  const [currentPage, setCurrentPage] = React.useState(1);
+import { getGarbageSubmissions } from "@/services";
+
+interface GarbageAttributes {
+  [key: string]: number; // For dynamic properties
+}
+
+interface Submission {
+  id: string;
+  property_id: string;
+  client_id: string;
+  client_type: string;
+  client_name: string;
+  borough_name: string;
+  street_name: string;
+  chute_present: boolean;
+  timestamp: string; // ISO 8601 format
+  garbage_attributes: GarbageAttributes;
+  created_by: string;
+}
+
+
+const EditEntryPage = ({ params: { propertyID } }: any) => {
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
   const rowsPerPage = 10;
 
-  // Dummy data
-  const submissions = Array.from({ length: 10 }, (_, i) => ({
-    date: "2023-06-23",
-    id: `BS-878${i}`,
-    clientType: "Client Type",
-    clientName: "Client Name",
-    details: "Borough Name, Street Name, Building Number",
-  }));
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const data = await getGarbageSubmissions();
+        setSubmissions(data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching garbage submissions", error);
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const submission  = submissions.find( item => item.property_id === propertyID);
+
+  console.log(submission)
+
 
   return (
     <>
@@ -53,11 +86,9 @@ const SubmissionsPage = () => {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <Card className="p-8">
-        <EditEntryForm entry={""}  />
-      </Card>
+      {!isLoading && submission !== undefined ? <EditEntryForm entry={submission}  /> : <p>Loading...</p> }
     </>
   );
 };
 
-export default SubmissionsPage;
+export default EditEntryPage;

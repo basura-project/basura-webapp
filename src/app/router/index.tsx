@@ -15,20 +15,37 @@ export const UserRouter = ({
   client: React.ReactNode;
   auth: React.ReactNode;
 }>): React.ReactNode => {
-  const [defaultRoute, setDefaultRoute] = useState<string>("auth");
+  const [defaultRoute, setDefaultRoute] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { user } = useUser();
+  const { user, fetchTime } = useUser();
 
   useEffect(() => {
-    // Set default route dynamically based on user role
-    if (user) {
-      setDefaultRoute(user.role);
-    } else {
-      setDefaultRoute("auth");
-    }
 
-    // Simulate loading time
-    setTimeout(() => setIsLoading(false), 200);
+    // Set default route dynamically based on user role
+    const handleRoutes = async () => {
+      if (user) {
+        if (user.role === "admin") {
+          setDefaultRoute("admin");
+        } else if (user.role === "employee") {
+          setDefaultRoute("employee");
+        } else if (user.role === "client") {
+          setDefaultRoute("client");
+        } else {
+          setDefaultRoute("auth");
+        }
+      } else {
+        const timeOutId = setTimeout(() => {
+          setIsLoading(false);
+          setDefaultRoute("auth")
+        }, fetchTime + 500);
+
+       return () => clearTimeout(timeOutId);
+      
+      }
+    };
+
+    handleRoutes();
+
   }, [user, defaultRoute]);
 
   // Map defaultRoute to the appropriate layout component
@@ -41,7 +58,7 @@ export const UserRouter = ({
 
   return (
     <>
-      {!isLoading ? routeComponents[defaultRoute] || auth : <Loading />}
+      {!isLoading ? routeComponents[defaultRoute] : <Loading />}
     </>
   );
 };
