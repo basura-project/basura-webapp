@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import React, { useEffect} from "react";
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,6 +9,10 @@ import Image from "next/image";
 
 import { cn } from "@/lib/utils";
 import { Icons } from "@/components/ui/icons";
+import {
+  Plus,
+  Minus
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -33,6 +37,11 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/components/ui/use-toast";
 import { suggestID, addProperty, editProperty } from "@/services/index";
+import { Value } from "@radix-ui/react-select";
+
+type ApartmentType = {
+  [key: string]: number;
+};
 
 export default function ResidentPropertyForm({
   className,
@@ -42,6 +51,13 @@ export default function ResidentPropertyForm({
 }: any) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [isError, setIsError] = React.useState<string>("");
+  const [bhkCount, setBhkCount] = React.useState<ApartmentType>({
+    bhk1: 0,
+    bhk2: 0,
+    bhk3: 0,
+    bhk4: 0,
+    bhk5: 0
+  });
   const { toast } = useToast();
 
   React.useEffect(() => {
@@ -55,6 +71,21 @@ export default function ResidentPropertyForm({
     };
     fetchSuggestedId();
  },[]);
+
+ const handleIncrement = (bhk: keyof ApartmentType) => {
+  setBhkCount((prev) => ({
+    ...prev,
+    [bhk]: (prev[bhk] ?? 0) + 1,
+  }));
+};
+
+const handleDecrement = (bhk: keyof ApartmentType) => {
+  setBhkCount((prev) => ({
+    ...prev,
+    [bhk]: Math.max(0, (prev[bhk] ?? 0) - 1),
+  }));
+};
+
 
   const formSchema = z.object({
     propertyType: z.string().optional(),
@@ -78,9 +109,18 @@ export default function ResidentPropertyForm({
       .string()
       .min(1, { message: "Please enter property manager's phone number" })
       .max(50),
-    apartmentType: z
-      .string()
-      .min(1, { message: "Please select apartment type" }),
+    apartmentType: z.object({
+      bhk1: z.number().optional(),
+      bhk2: z.number().optional(),
+      bhk3: z.number().optional(),
+      bhk4: z.number().optional(),
+      bhk5: z.number().optional(),
+    }).refine(data => {
+      // Check if at least one of the bhk fields has a value
+      return data.bhk1 !== undefined || data.bhk2 !== undefined || data.bhk3 !== undefined || data.bhk4 !== undefined || data.bhk5 !== undefined;
+    }, {
+      message: "Please select at least one apartment type" 
+    }),
     housingType: z.string().min(1, { message: "Please select housing type" }),
     boroughName: z.string().min(1, { message: "Please enter borough name" }),
     streetName: z.string().min(1, { message: "Please enter street name" }),
@@ -141,7 +181,13 @@ export default function ResidentPropertyForm({
       ownerPhoneNo: "",
       propertyManagerName: "",
       propertyManagerContact: "",
-      apartmentType: "",
+      apartmentType: {
+        bhk1: 0,
+        bhk2: 0,
+        bhk3: 0,
+        bhk4: 0,
+        bhk5: 0,
+      },
       housingType: "",
       boroughName: "",
       streetName: "",
@@ -426,33 +472,40 @@ export default function ResidentPropertyForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Apartment</FormLabel>
-                <Select>
+                <Select
+                  >
                   <SelectTrigger>
                     <SelectValue placeholder="Select Apartment Type" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>No. of bedrooms</SelectLabel>
-                      <SelectItem value="1BHK">1 BHK</SelectItem>
-                      <SelectItem value="2BHK">2 BHK</SelectItem>
-                      <SelectItem value="3BHK">3 BHK</SelectItem>
-                      <SelectItem value="4BHK">4 BHK</SelectItem>
-                      <SelectItem value="5BHK">5 BHK</SelectItem>
-                      <SelectItem value="6BHK">6 BHK</SelectItem>
-                      <SelectItem value="7BHK">7 BHK</SelectItem>
-                      <SelectItem value="8BHK">8 BHK</SelectItem>
-                      <SelectItem value="9BHK">9 BHK</SelectItem>
-                      <SelectItem value="10BHK">10 BHK</SelectItem>
-                      <SelectItem value="11BHK">11 BHK</SelectItem>
-                      <SelectItem value="12BHK">12 BHK</SelectItem>
-                      <SelectItem value="19BHK">13 BHK</SelectItem>
-                      <SelectItem value="14BHK">14 BHK</SelectItem>
-                      <SelectItem value="15BHK">15 BHK</SelectItem>
-                      <SelectItem value="16BHK">16 BHK</SelectItem>
-                      <SelectItem value="17BHK">17 BHK</SelectItem>
-                      <SelectItem value="18BHK">18 BHK</SelectItem>
-                      <SelectItem value="19BHK">19 BHK</SelectItem>
-                      <SelectItem value="20BHK">20 BHK</SelectItem>
+                      {Object.keys(bhkCount).map((bhk) => (
+                        <div key={bhk} className="flex justify-between items-center px-4">
+                          <span>{bhk.replace("bhk", "")} BHK</span>
+                          <div className="flex justify-evenly items-center">
+                            <Button
+                              disabled={bhkCount[bhk] <= 0}
+                              variant="link"
+                              className="text-sm font-normal hover:no-underline"
+                              onClick={() => handleDecrement(bhk as keyof ApartmentType)}
+                            >
+                              <Minus width={18} />
+                            </Button>
+                            <span className="max-w-4 min-w-4">
+                              <b>{bhkCount[bhk]}</b>
+                            </span>
+                            <Button
+                              disabled={bhkCount[bhk] >= 20}
+                              variant="link"
+                              className="text-sm font-normal hover:no-underline"
+                              onClick={() => handleIncrement(bhk as keyof ApartmentType)}
+                            >
+                              <Plus width={18} />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
                     </SelectGroup>
                   </SelectContent>
               </Select>
