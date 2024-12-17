@@ -416,11 +416,10 @@ export const getPropertyDetailsForAddEntry = async (propertyId: string) => {
 // Get garbage submissions
 export const getGarbageSubmissions = async (
   page?: number,
-  pageSize?: number
 ) => {
   try {
     const response = await apiService.get("submissions", {
-      params: { page, page_size: pageSize },
+      params: { page },
     });
     return response.data;
   } catch (error) {
