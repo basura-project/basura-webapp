@@ -65,6 +65,7 @@ interface Submission {
 
 import { getGarbageSubmissions, deleteGarbageEntry, Params } from "@/services";
 import TableSkeleton from "@/components/ui/skeleton/TableSkeleton";
+import { timeStamp } from "console";
 
 
 export default function SubmissionsList() {
@@ -72,7 +73,6 @@ export default function SubmissionsList() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [totalItems, setTotalItems] = useState(0);
   const [sortField, setSortField] = useState<"timestamp" | "id">("timestamp");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [deleteModalOpen, setDeleteModalOpen] = useState<boolean>(false);
@@ -88,7 +88,6 @@ export default function SubmissionsList() {
         const data = await getGarbageSubmissions(currentPage);
         const submissionsWithData = updateSubmissionsWithExpiry(data);
         setSubmissions(submissionsWithData); 
-        setTotalItems(data.length || 0);
         setRowsPerPage(data.length < 10 ? 5 : 10); 
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -97,7 +96,7 @@ export default function SubmissionsList() {
           description: "Failed to fetch submissions.",
         });
       } finally {
-        setIsLoading(false); // Reset loading state after fetching, regardless of success or failure
+        setIsLoading(false);
       }
     };
 
@@ -112,11 +111,23 @@ export default function SubmissionsList() {
     };
 
     fetchData(); 
-  }, [currentPage]); 
+  }, []); 
 
   let lastIndex : number = currentPage * rowsPerPage;
   let firstIndex : number = lastIndex - rowsPerPage;
   let currentItems = submissions.slice(firstIndex, lastIndex);
+
+  const formatDate = (timeStamp: string) => {
+    const date = new Date(timeStamp);
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    };
+    return date.toLocaleString("en-US", options);
+  };
 
 
   const handleSort = (field: "timestamp" | "id") => {
@@ -173,15 +184,11 @@ export default function SubmissionsList() {
     }
   };
 
-  const handleSetCurrentPage = (page: number) => {
+  const handleOnPageChange = (page: number) => {
     setCurrentPage(page);
   };
 
-  const handleSetRowsPerPage = (rows: number) => {
-    setRowsPerPage(rows);
-    setCurrentPage(1);
-  };
-
+  
   if(isLoading) {
    return (
     <>
@@ -224,7 +231,7 @@ export default function SubmissionsList() {
           <TableBody>
             {currentItems.map((submission) => (
               <TableRow key={submission.id}>
-                <TableCell>{submission.timestamp}</TableCell>
+                <TableCell>{formatDate(submission.timestamp)}</TableCell>
                 {/* <TableCell>{submission.id}</TableCell> */}
                 <TableCell>
                   <Button variant="outline" size="sm">
@@ -316,7 +323,7 @@ export default function SubmissionsList() {
           </TableBody>
         </Table>
       </Card>
-      <Pagination totalItems={totalItems} currentPage={currentPage} rowsPerPage={rowsPerPage} setCurrentPage={handleSetCurrentPage} setRowsPerPage={handleSetRowsPerPage} />
+      <Pagination data={submissions} currentPage={currentPage} rowsPerPage={rowsPerPage} onPageChange={handleOnPageChange} />
       </>
   );
 }

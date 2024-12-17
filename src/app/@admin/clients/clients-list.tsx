@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import React, { useState } from "react";
 
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
@@ -40,6 +40,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { usePreloader } from "@/lib/preloader/usePreloaderHook";
+import Pagination from "@/lib/pagination";
+import TableSkeleton from "@/components/ui/skeleton/TableSkeleton";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -49,6 +51,8 @@ export default function ClientList({ className, ...props }: UserAuthFormProps) {
   const [selectedClient, setSelectedClient] = React.useState<string>("");
   const { toast } = useToast();
   const router = useRouter();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const { data, isDataLoading, error, setData} = usePreloader(getClients,"Clients");
 
   function viewClient(clientId: string) {
@@ -93,6 +97,15 @@ export default function ClientList({ className, ...props }: UserAuthFormProps) {
     }
   }
 
+  const handleOnPageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  let lastIndex : number = currentPage * rowsPerPage;
+  let firstIndex : number = lastIndex - rowsPerPage;
+  let currentItems = data && data.slice(firstIndex, lastIndex);
+  
+
   if (error) {
     return <div>Error fetching data: {error}</div>;
   }
@@ -100,8 +113,9 @@ export default function ClientList({ className, ...props }: UserAuthFormProps) {
   return (
     <div className={cn("grid gap-2", className)} {...props}>
       {isDataLoading ? (
-        <Icons.spinner className="mx-auto my-4 h-6 w-6 animate-spin" />
+        <TableSkeleton rows={5} />
       ) : (
+        <>
         <Table>
           <TableHeader>
             <TableRow>
@@ -114,7 +128,7 @@ export default function ClientList({ className, ...props }: UserAuthFormProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data?.map((row: any) => {
+            {currentItems?.map((row: any) => {
               return (
                 <TableRow key={row.client_id}>
                   <TableCell>{row.client_id}</TableCell>
@@ -201,6 +215,13 @@ export default function ClientList({ className, ...props }: UserAuthFormProps) {
             })}
           </TableBody>
         </Table>
+        <Pagination
+          data={data}
+          currentPage={currentPage}
+          rowsPerPage={rowsPerPage}
+          onPageChange={handleOnPageChange}
+        />
+        </>
       )}
     </div>
   );

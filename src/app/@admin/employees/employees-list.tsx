@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import React, { useState } from "react";
 
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
@@ -40,6 +40,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { usePreloader } from "@/lib/preloader/usePreloaderHook";
+import Pagination from "@/lib/pagination";
+import { TableSkeleton } from "@/components/ui/skeleton/TableSkeleton";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -49,6 +51,8 @@ export default function EmployeesList({
 }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [deleteModalOpen, setDeleteModalOpen] = React.useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [selectedEmployee, setSelectedEmployee] = React.useState<string>("");
   const { toast } = useToast();
   const router = useRouter();
@@ -98,6 +102,14 @@ export default function EmployeesList({
     }
   }
 
+  const handleOnPageChange = (page: number) => {
+    setCurrentPage(page);
+};
+
+  let lastIndex : number = currentPage * rowsPerPage;
+  let firstIndex : number = lastIndex - rowsPerPage;
+  let currentItems = data && data.slice(firstIndex, lastIndex);
+
   if (error) {
     return <div>Error fetching data: {error}</div>;
   }
@@ -105,8 +117,9 @@ export default function EmployeesList({
   return (
     <div className={cn("grid gap-2", className)} {...props}>
       {isDataLoading ? (
-        <Icons.spinner className="mx-auto my-4 h-6 w-6 animate-spin" />
+        <TableSkeleton rows={5} />
       ) : (
+      <>
       <Table>
         <TableHeader>
           <TableRow>
@@ -118,7 +131,7 @@ export default function EmployeesList({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data?.map((row: any) => {
+          {currentItems?.map((row: any) => {
             return (
               <TableRow key={row.employee_id}>
                 <TableCell>{row.employee_id}</TableCell>
@@ -201,6 +214,8 @@ export default function EmployeesList({
           })}
         </TableBody>
       </Table>
+      <Pagination data={data} currentPage={currentPage} rowsPerPage={rowsPerPage} onPageChange={handleOnPageChange} />
+      </>
       )}
     </div>
   );

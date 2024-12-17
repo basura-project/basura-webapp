@@ -1,4 +1,5 @@
-
+"use client";
+import { useState, useEffect } from "react";
 import {
   ChevronLeftIcon,
   ChevronsLeft,
@@ -19,49 +20,45 @@ import {
 interface PaginationProps {
   currentPage: number;
   rowsPerPage: number;
-  totalItems: number;
-  setCurrentPage: (value: number) => void;
-  setRowsPerPage: (value: number) => void;
+  data: any;
+  onPageChange: (page: number) => void;
 }
 
+
 function Pagination(props: PaginationProps) {
-  const {
-    currentPage,
-    rowsPerPage,
-    totalItems,
-    setCurrentPage,
-    setRowsPerPage,
-  } = props;
+  const [page, setPage] = useState(props.currentPage || 0);
+  const [rows, setRows] = useState(props.rowsPerPage || 0);
+  const [totalItems, setTotalItems] = useState(props.data?.length || 0);
+  const [totalPages, setTotalPages] = useState(Math.ceil(props.data?.length / props.rowsPerPage));
 
-  // Total number of pages (replace with your actual logic)
-  const totalPages = Math.ceil(totalItems / rowsPerPage);
+  const { onPageChange } = props;
 
-  // Handle page change
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+      setPage(page);
+      onPageChange(page);
   };
 
   // Handle rows per page change
   const handleRowsPerPageChange = (value: string) => {
-    setRowsPerPage(parseInt(value, 10));
-    setCurrentPage(1); // Reset to first page when rows per page changes
+    setRows(parseInt(value, 10));
+    setPage(1);
   };
 
   return (
     <div className="flex items-center justify-between space-x-4 mt-8 text-sm">
       {/* Rows per page dropdown */}
       <div className="text-sm text-gray-500">
-        {`1 of ${Math.ceil(totalItems / rowsPerPage)} selected`}
+        {`1 of ${Math.ceil(totalItems / rows)} selected`}
       </div>
       <div className="flex items-center">
         <div className="flex items-center space-y-0 mr-8">
           <span className="mr-4">Rows per page</span>
           <Select
             onValueChange={handleRowsPerPageChange}
-            value={rowsPerPage.toString()}
+            value={rows.toString()}
           >
             <SelectTrigger className="w-[80px]">
-              <SelectValue placeholder={rowsPerPage.toString()} />
+              <SelectValue placeholder={rows.toString()} />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
@@ -78,7 +75,7 @@ function Pagination(props: PaginationProps) {
         {/* Page information */}
         <div className="mr-8">
           <span>
-            Page {currentPage} of {totalPages}
+            Page {page} of {totalPages}
           </span>
         </div>
 
@@ -87,7 +84,7 @@ function Pagination(props: PaginationProps) {
           {/* First page button */}
           <button
             className="p-2 rounded outline outline-1 outline-gray-300 disabled:opacity-50"
-            disabled={currentPage === 1}
+            disabled={page === 1}
             onClick={() => handlePageChange(1)}
           >
             <ChevronsLeft className="w-4 h-4" />
@@ -96,8 +93,8 @@ function Pagination(props: PaginationProps) {
           {/* Previous page button */}
           <button
             className="p-2 rounded outline outline-1 outline-gray-300 disabled:opacity-50"
-            disabled={currentPage === 1}
-            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={page === 1}
+            onClick={() => handlePageChange(page - 1)}
           >
             <ChevronLeftIcon className="w-4 h-4" />
           </button>
@@ -105,8 +102,8 @@ function Pagination(props: PaginationProps) {
           {/* Next page button */}
           <button
             className="p-2 rounded outline outline-1 outline-gray-300 disabled:opacity-50"
-            disabled={currentPage === totalPages || totalItems < rowsPerPage}
-            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={page === totalPages || totalItems < rows}
+            onClick={() => handlePageChange(page + 1)}
           >
             <ChevronRightIcon className="w-4 h-4" />
           </button>
@@ -114,7 +111,7 @@ function Pagination(props: PaginationProps) {
           {/* Last page button */}
           <button
             className="p-2 rounded outline outline-1 outline-gray-300 disabled:opacity-50"
-            disabled={currentPage === totalPages || totalItems < rowsPerPage}
+            disabled={page === totalPages || totalItems < rows}
             onClick={() => handlePageChange(totalPages)}
           >
             <ChevronsRight className="w-4 h-4" />
